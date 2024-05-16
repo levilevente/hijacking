@@ -11,7 +11,7 @@ namespace hijacking
     {
         private static CameraDescriptor cameraDescriptor = new();
 
-        private static CubeArrangementModel cubeArrangementModel = new();
+        private static ArrangementModel arrangementModel = new();
 
         private static IWindow window;
 
@@ -28,6 +28,8 @@ namespace hijacking
         private static GlCube skyBox;
 
         private static float Shininess = 50;
+
+        private static float viewerPositionSpeed = 0.09f;
 
         private const string ModelMatrixVariableName = "uModel";
         private const string NormalMatrixVariableName = "uNormal";
@@ -154,8 +156,11 @@ namespace hijacking
                 case Key.D:
                     cameraDescriptor.DecreaseZXAngle();
                     break;
-                case Key.Space:
-                    cubeArrangementModel.AnimationEnabeld = !cubeArrangementModel.AnimationEnabeld;
+                case Key.Q:
+                    arrangementModel.TurnLeft();
+                    break;
+                case Key.W:
+                    arrangementModel.TurnRight();
                     break;
             }
         }
@@ -166,7 +171,8 @@ namespace hijacking
             // multithreaded
             // make sure it is threadsafe
             // NO GL calls
-            cubeArrangementModel.AdvanceTime(deltaTime);
+            arrangementModel.AdvanceTime();
+            
 
             controller.Update((float)deltaTime);
         }
@@ -190,7 +196,11 @@ namespace hijacking
             SetViewerPosition();
             SetShininess();
 
-            DrawPulsingCat();
+            DrawAirbus();
+            
+            // add a constant to airbus position to move it forward (add to z coordinate of the position)
+
+            
             DrawSkyBox();
 
             //ImGuiNET.ImGui.ShowDemoWindow();
@@ -282,25 +292,21 @@ namespace hijacking
             CheckError();
         }
 
-        private static unsafe void DrawPulsingCat()
+        private static unsafe void DrawAirbus()
         {
             // set material uniform to rubber
 
-            /*var modelMatrixForCenterCube = Matrix4X4.CreateScale((float)cubeArrangementModel.CenterCubeScale);
-            SetModelMatrix(modelMatrixForCenterCube);
-            Gl.BindVertexArray(teapot.Vao);
-            Gl.DrawElements(GLEnum.Triangles, teapot.IndexArrayLength, GLEnum.UnsignedInt, null);
-            Gl.BindVertexArray(0);*/
 
+            var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.airplaneTranslation);
+            var modelMatrixForCenterCube = translationMatrix;
+            SetModelMatrix(modelMatrixForCenterCube);
+            Gl.BindVertexArray(airbus.Vao);
+            
             //var modelMatrixForTable = Matrix4X4.CreateScale(1f, 1f, 1f);
             //SetModelMatrix(modelMatrixForTable);
             //Gl.BindVertexArray(table.Vao);
             //Gl.DrawElements(GLEnum.Triangles, table.IndexArrayLength, GLEnum.UnsignedInt, null);
             //Gl.BindVertexArray(0);
-            
-            Matrix4X4<float> modelMatrix = Matrix4X4.CreateScale(1f);
-            SetModelMatrix(modelMatrix);
-            Gl.BindVertexArray(airbus.Vao);
 
             int textureLocation = Gl.GetUniformLocation(program, TextureUniformVariableName);
             if (textureLocation == -1)
@@ -354,11 +360,10 @@ namespace hijacking
 
         private static unsafe void SetUpObjects()
         {
-
-            float[] face1Color = [1f, 0f, 0f, 1.0f];
-
-            airbus = ObjResourceReader.CreateAirbus(Gl, face1Color);
+            airbus = ObjResourceReader.CreateAirbus(Gl);
             skyBox = GlCube.CreateInteriorCube(Gl);
+            
+            arrangementModel = new();
         }
 
         

@@ -37,6 +37,20 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Silk.NET": {
+              "target": "Package",
+              "version": "[2.21.0, )"
+            },
+            "Silk.NET.OpenGL.Extensions.ImGui": {
+              "target": "Package",
+              "version": "[2.21.0, )"
+            },
+            "StbImageSharp": {
+              "target": "Package",
+              "version": "[2.27.14, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

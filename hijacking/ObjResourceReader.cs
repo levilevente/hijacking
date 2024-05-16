@@ -6,23 +6,24 @@ namespace hijacking
 {
     internal class ObjResourceReader
     {
-        public static unsafe GlObject CreateAirbus(GL Gl, float[] faceColor)
+        public static unsafe GlObject CreateAirbus(GL Gl)
         {
             uint vao = Gl.GenVertexArray();
             Gl.BindVertexArray(vao);
+            int wingIndex = 0;
 
             List<float[]> objVertices;
             List<(int Vertex, int Texture,int Normal)[]> objFaces;
             List<float[]> objNormals;
             List<float[]> objTextures;
-
+            
             ReadObjDataForAirbus(out objVertices, out objFaces, out objNormals, out objTextures);
 
             List<float> glVertices = new List<float>();
             List<float> glColors = new List<float>();
             List<uint> glIndices = new List<uint>();
 
-            CreateGlArraysFromObjArrays(faceColor, objVertices, objFaces, objNormals, objTextures, glVertices, glColors, glIndices);
+            CreateGlArraysFromObjArrays(objVertices, objFaces, objNormals, objTextures, glVertices, glColors, glIndices);
 
             return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices);
         }
@@ -44,10 +45,6 @@ namespace hijacking
             Gl.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, vertexSize, (void*)offsetNormal);
 
             uint colors = Gl.GenBuffer();
-            //Gl.BindBuffer(GLEnum.ArrayBuffer, colors);
-            //Gl.BufferData(GLEnum.ArrayBuffer, (ReadOnlySpan<float>)colorArray.AsSpan(), GLEnum.StaticDraw);
-            //Gl.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, null);
-            //Gl.EnableVertexAttribArray(1);
 
             // set texture
             // create texture
@@ -86,7 +83,7 @@ namespace hijacking
             return new GlObject(vao, vertices, colors, indices, indexArrayLength, Gl, texture);
         }
 
-        private static unsafe void CreateGlArraysFromObjArrays(float[] faceColor, List<float[]> objVertices, List<(int Vertex, int Texture,int Normal)[]> objFaces, List<float[]>objNormals, List<float[]>objTextures, List<float> glVertices, List<float> glColors, List<uint> glIndices)
+        private static unsafe void CreateGlArraysFromObjArrays(List<float[]> objVertices, List<(int Vertex, int Texture,int Normal)[]> objFaces, List<float[]>objNormals, List<float[]>objTextures, List<float> glVertices, List<float> glColors, List<uint> glIndices)
         {
             Dictionary<string, int> glVertexIndices = new Dictionary<string, int>();
 
@@ -140,7 +137,6 @@ namespace hijacking
             objTextures = new List<float[]>();
 
 
-            bool body = true;
             using (Stream objStream = typeof(ObjResourceReader).Assembly.GetManifestResourceStream("hijacking.Resources.airbus.plane.obj"))
             using (StreamReader objReader = new StreamReader(objStream))
             {
@@ -153,7 +149,6 @@ namespace hijacking
                     } else if (line.Trim().StartsWith("# object airplane_wings"))
                     {
                         Console.WriteLine("Found airplane_wings");
-                        body = false;
                     }
                     if (String.IsNullOrEmpty(line) || line.Trim().StartsWith("#"))
                         continue;
@@ -190,7 +185,6 @@ namespace hijacking
                                 float[] texture = new float[3];
                                 for (int i = 0; i < texture.Length; i++)
                                     texture[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture);
-                                if (body){}
                                 objTextures.Add(texture);
                                 break;
                         }    

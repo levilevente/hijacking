@@ -47,6 +47,8 @@ namespace hijacking
                 return Vector3D<float>.Zero;
             }
         }
+        
+
 
         public void IncreaseZXAngle()
         {
@@ -78,7 +80,9 @@ namespace hijacking
         {
             DistanceToOrigin = DistanceToOrigin / DistanceScaleFactor;
         }
-
+        
+        
+        
         private static Vector3D<float> GetPointFromAngles(double distanceToOrigin, double angleToMinZYPlane, double angleToMinZXPlane)
         {
             var x = distanceToOrigin * Math.Cos(angleToMinZXPlane) * Math.Sin(angleToMinZYPlane);

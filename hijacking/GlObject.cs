@@ -13,6 +13,8 @@ namespace hijacking
         public uint IndexArrayLength { get; }
 
         private GL Gl;
+        
+        private Hitbox Hitbox;
 
         public GlObject(uint vao, uint vertices, uint colors, uint indeces, uint indexArrayLength, GL gl, uint texture = 0)
         {
@@ -33,5 +35,6 @@ namespace hijacking
             Gl.DeleteBuffer(Indices);
             Gl.DeleteVertexArray(Vao);
         }
+        
     }
 }
