@@ -11,10 +11,15 @@ namespace hijacking
 
         public Vector3D<float> airplaneTranslation;
         public Vector3D<float>[] aircraftPosition;
+        public Vector3D<float> roadPosition;
         
         public ArrangementModel()
         {
             airplaneTranslation = new Vector3D<float>(0, 0, 0);
+            Random r = new Random();
+            int r_x = r.Next(-3000, 3000);
+            int r_z = r.Next(-3000, 3000);
+            roadPosition = new Vector3D<float>(r_x, -1000, r_z);
             aircraftPosition = new Vector3D<float>[4];
             
             for (int i = 0; i < aircraftPosition.Length; i++)
@@ -22,10 +27,10 @@ namespace hijacking
                 aircraftPosition[i] = new Vector3D<float>(0, 0, 0);
             }
 
-            aircraftPosition[0] = new Vector3D<float>(100, 100, 100);
-            aircraftPosition[1] = new Vector3D<float>(-100, 100, 100);
-            aircraftPosition[2] = new Vector3D<float>(100, -100, 100);
-            aircraftPosition[3] = new Vector3D<float>(-100, -100, 100);
+            aircraftPosition[0] = new Vector3D<float>(700, 0, 700);
+            aircraftPosition[1] = new Vector3D<float>(-700, 0, 700);
+            aircraftPosition[2] = new Vector3D<float>(-700, 0, -700);
+            aircraftPosition[3] = new Vector3D<float>(700, 0, -700);
         }
 
         public void AdvanceTime()
@@ -34,6 +39,14 @@ namespace hijacking
             if (airplaneTranslation.Z > 10000)
             {
                 airplaneTranslation.Z = -10000;
+            }
+            for (int i = 0; i < aircraftPosition.Length; i++)
+            {
+                aircraftPosition[i].Z -= movementSpeed;
+                if (aircraftPosition[i].Z > 10000)
+                {
+                    aircraftPosition[i].Z = -10000;
+                }
             }
         }
         

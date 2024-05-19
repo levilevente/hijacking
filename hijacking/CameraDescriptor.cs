@@ -6,7 +6,7 @@ namespace hijacking
         private const double AngleChangeStepSize = Math.PI / 180 * 5;
         private const float MoveSpeed = 0.9f;
 
-        public Vector3D<float> Position { get; private set; } = new Vector3D<float>(0.0f, 400.0f, 400.0f);
+        public Vector3D<float> Position { get; private set; } = new Vector3D<float>(0.0f, 5000.0f, 5000.0f);
 
         public Vector3D<float> UpVector { get; private set; } = new Vector3D<float>(0, 1, 0);
 

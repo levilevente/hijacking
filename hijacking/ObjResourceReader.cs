@@ -28,6 +28,27 @@ namespace hijacking
             return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "body.png");
         }
 
+        public static unsafe GlObject CreateFighterJet(GL Gl)
+        {
+            uint vao = Gl.GenVertexArray();
+            Gl.BindVertexArray(vao);
+
+            List<float[]> objVertices;
+            List<(int Vertex, int Texture,int Normal)[]> objFaces;
+            List<float[]> objNormals;
+            List<float[]> objTextures;
+            
+            ReadObjDataForFighter(out objVertices, out objFaces, out objNormals, out objTextures);
+
+            List<float> glVertices = new List<float>();
+            List<float> glColors = new List<float>();
+            List<uint> glIndices = new List<uint>();
+
+            CreateGlArraysFromObjArrays(objVertices, objFaces, objNormals, objTextures, glVertices, glColors, glIndices);
+
+            return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "fighter_body.jpg");
+        }
+
         private static unsafe GlObject CreateOpenGlObject(GL Gl, uint vao, List<float> glVertices, List<float> glColors, List<uint> glIndices, String textureFile)
         {
             uint offsetPos = 0;
@@ -193,6 +214,62 @@ namespace hijacking
                 
             }
         }
+        
+        
+        private static unsafe void ReadObjDataForFighter(out List<float[]> objVertices, out List<(int Vertex, int Texture,int Normal)[]> objFaces, out List<float[]>objNormals, out List<float[]>objTextures)
+        {
+            objVertices = new List<float[]>();
+            objFaces = new List<(int Vertex, int Texture,int Normal)[]>();
+            objNormals = new List<float[]>();
+            objTextures = new List<float[]>();
+
+
+            using (Stream objStream = typeof(ObjResourceReader).Assembly.GetManifestResourceStream("hijacking.Resources.airbus.fighter.obj"))
+            using (StreamReader objReader = new StreamReader(objStream))
+            {
+                while (!objReader.EndOfStream)
+                {
+                    var line = objReader.ReadLine().Replace("  ", " ");
+                    if (line.Trim().StartsWith("vn") || line.Trim().StartsWith("f") || line.Trim().StartsWith("v") || line.Trim().StartsWith("vt"))
+                    {
+                        var lineClassifier = line.Substring(0, line.IndexOf(' '));
+                        var lineData = line.Substring(lineClassifier.Length).Trim().Split(' ');
+
+                        switch (lineClassifier)
+                        {
+                            case "v":
+                                float[] vertex = new float[3];
+                                for (int i = 0; i < vertex.Length; ++i)
+                                    vertex[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture) * 100;
+                                objVertices.Add(vertex);
+                                
+                                break;
+                            case "f":
+                                (int Vertex, int Texture,int Normal)[] face = new (int Vertex, int Texture,int Normal)[4];
+                                for (int i = 0; i < face.Length; ++i)
+                                    face[i] = new (int.Parse(lineData[i].Split('/')[0], CultureInfo.InvariantCulture), int.Parse(lineData[i].Split('/')[1], CultureInfo.InvariantCulture), int.Parse(lineData[i].Split('/')[2], CultureInfo.InvariantCulture));
+                                objFaces.Add(face);
+                                break;
+                            case "vn":
+                                float[] normal = new float[3];
+                                for (int i = 0; i < normal.Length; i++)
+                                    normal[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture);
+                                objNormals.Add(normal);
+                                break;
+                            case "vt":
+                                float[] texture = new float[2];
+                                for (int i = 0; i < texture.Length; i++)
+                                    texture[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture);
+                                objTextures.Add(texture);
+                                break;
+                        }    
+                    }
+                    
+                } 
+                
+            }
+        }
+        
         private static unsafe ImageResult ReadTextureImage(string textureResource)
         {
             ImageResult result;
@@ -233,7 +310,7 @@ namespace hijacking
             objTextures = new List<float[]>();
 
 
-            using (Stream objStream = typeof(ObjResourceReader).Assembly.GetManifestResourceStream("hijacking.Resources.airbus.plane.obj"))
+            using (Stream objStream = typeof(ObjResourceReader).Assembly.GetManifestResourceStream("hijacking.Resources.airbus.road.obj"))
             using (StreamReader objReader = new StreamReader(objStream))
             {
                 while (!objReader.EndOfStream)
@@ -254,7 +331,7 @@ namespace hijacking
                             case "v":
                                 float[] vertex = new float[3];
                                 for (int i = 0; i < vertex.Length; ++i)
-                                    vertex[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture);
+                                    vertex[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture) * 300;
                                 objVertices.Add(vertex);
                                 
                                 break;

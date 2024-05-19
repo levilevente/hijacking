@@ -25,7 +25,7 @@ namespace hijacking
         
         private static GlObject airbus;
         
-        private static GlObject[] fighterJets = new GlObject[3];
+        private static GlObject[] fighterJets = new GlObject[4];
         
         private static GlObject road;
         
@@ -171,7 +171,7 @@ namespace hijacking
             // make sure it is threadsafe
             // NO GL calls
             arrangementModel.AdvanceTime();
-            cameraDescriptor.MoveForward();
+            //cameraDescriptor.MoveForward();
 
 
             controller.Update((float)deltaTime);
@@ -199,6 +199,7 @@ namespace hijacking
             DrawAirbus();
             DrawSkyBox();
             DrawRoad();
+            DrawFighter();
 
             //ImGuiNET.ImGui.ShowDemoWindow();
             ImGuiNET.ImGui.Begin("Lighting properties",
@@ -208,60 +209,6 @@ namespace hijacking
 
 
             controller.Render();
-        }
-
-        private static unsafe void DrawSkyBox()
-        {
-            Matrix4X4<float> modelMatrix = Matrix4X4.CreateScale(10000f);
-            SetModelMatrix(modelMatrix);
-            Gl.BindVertexArray(skyBox.Vao);
-
-            int textureLocation = Gl.GetUniformLocation(program, TextureUniformVariableName);
-            if (textureLocation == -1)
-            {
-                throw new Exception($"{TextureUniformVariableName} uniform not found on shader.");
-            }
-            // set texture 0
-            Gl.Uniform1(textureLocation, 0);
-
-            Gl.ActiveTexture(TextureUnit.Texture0);
-            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (float)GLEnum.Linear);
-            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)GLEnum.Linear);
-            Gl.BindTexture(TextureTarget.Texture2D, skyBox.Texture.Value);
-
-            Gl.DrawElements(GLEnum.Triangles, skyBox.IndexArrayLength, GLEnum.UnsignedInt, null);
-            Gl.BindVertexArray(0);
-
-            CheckError();
-            Gl.BindTexture(TextureTarget.Texture2D, 0);
-            CheckError();
-        }
-        
-        private static unsafe void DrawRoad()
-        {
-            Matrix4X4<float> modelMatrix = Matrix4X4.CreateScale(10000f);
-            SetModelMatrix(modelMatrix);
-            Gl.BindVertexArray(road.Vao);
-
-            int textureLocation = Gl.GetUniformLocation(program, TextureUniformVariableName);
-            if (textureLocation == -1)
-            {
-                throw new Exception($"{TextureUniformVariableName} uniform not found on shader.");
-            }
-            // set texture 0
-            Gl.Uniform1(textureLocation, 0);
-
-            Gl.ActiveTexture(TextureUnit.Texture0);
-            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (float)GLEnum.Linear);
-            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)GLEnum.Linear);
-            Gl.BindTexture(TextureTarget.Texture2D, road.Texture.Value);
-
-            Gl.DrawElements(GLEnum.Triangles, road.IndexArrayLength, GLEnum.UnsignedInt, null);
-            Gl.BindVertexArray(0);
-
-            CheckError();
-            Gl.BindTexture(TextureTarget.Texture2D, 0);
-            CheckError();
         }
 
         private static unsafe void SetLightColor()
@@ -316,11 +263,63 @@ namespace hijacking
             CheckError();
         }
 
+        private static unsafe void DrawSkyBox()
+        {
+            Matrix4X4<float> modelMatrix = Matrix4X4.CreateScale(40000f);
+            SetModelMatrix(modelMatrix);
+            Gl.BindVertexArray(skyBox.Vao);
+
+            int textureLocation = Gl.GetUniformLocation(program, TextureUniformVariableName);
+            if (textureLocation == -1)
+            {
+                throw new Exception($"{TextureUniformVariableName} uniform not found on shader.");
+            }
+            // set texture 0
+            Gl.Uniform1(textureLocation, 0);
+
+            Gl.ActiveTexture(TextureUnit.Texture0);
+            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (float)GLEnum.Linear);
+            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)GLEnum.Linear);
+            Gl.BindTexture(TextureTarget.Texture2D, skyBox.Texture.Value);
+
+            Gl.DrawElements(GLEnum.Triangles, skyBox.IndexArrayLength, GLEnum.UnsignedInt, null);
+            Gl.BindVertexArray(0);
+
+            CheckError();
+            Gl.BindTexture(TextureTarget.Texture2D, 0);
+            CheckError();
+        }
+        
+        private static unsafe void DrawRoad()
+        {
+            var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.roadPosition);
+            var modelMatrix =  translationMatrix;
+            SetModelMatrix(modelMatrix);
+            Gl.BindVertexArray(road.Vao);
+
+            int textureLocation = Gl.GetUniformLocation(program, TextureUniformVariableName);
+            if (textureLocation == -1)
+            {
+                throw new Exception($"{TextureUniformVariableName} uniform not found on shader.");
+            }
+            // set texture 0
+            Gl.Uniform1(textureLocation, 0);
+
+            Gl.ActiveTexture(TextureUnit.Texture0);
+            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (float)GLEnum.Linear);
+            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)GLEnum.Linear);
+            Gl.BindTexture(TextureTarget.Texture2D, road.Texture.Value);
+
+            Gl.DrawElements(GLEnum.Triangles, road.IndexArrayLength, GLEnum.UnsignedInt, null);
+            Gl.BindVertexArray(0);
+
+            CheckError();
+            Gl.BindTexture(TextureTarget.Texture2D, 0);
+            CheckError();
+        }
+        
         private static unsafe void DrawAirbus()
         {
-            // set material uniform to rubber
-
-
             var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.airplaneTranslation);
             //var rotationMatrix = Matrix4X4.CreateRotationX((float)-Math.PI/2);
             var modelMatrixForCenterCube = translationMatrix;
@@ -354,7 +353,47 @@ namespace hijacking
             Gl.BindTexture(TextureTarget.Texture2D, 0);
             CheckError();
         }
+        
+        private static unsafe void DrawFighter()
+        {
+            // set material uniform to rubber
+            for (int i = 0; i < fighterJets.Length; i++)
+            {
+                var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.aircraftPosition[i]);
+                //var rotationMatrix = Matrix4X4.CreateRotationX((float)-Math.PI/2);
+                var modelMatrixForCenterCube = translationMatrix;
+                //var modelMatrixForCenterCube = translationMatrix;
+                SetModelMatrix(modelMatrixForCenterCube);
+                Gl.BindVertexArray(fighterJets[i].Vao);
+            
+                //var modelMatrixForTable = Matrix4X4.CreateScale(1f, 1f, 1f);
+                //SetModelMatrix(modelMatrixForTable);
+                //Gl.BindVertexArray(table.Vao);
+                //Gl.DrawElements(GLEnum.Triangles, table.IndexArrayLength, GLEnum.UnsignedInt, null);
+                //Gl.BindVertexArray(0);
 
+                int textureLocation = Gl.GetUniformLocation(program, TextureUniformVariableName);
+                if (textureLocation == -1)
+                {
+                    throw new Exception($"{TextureUniformVariableName} uniform not found on shader.");
+                }
+                // set texture 0
+                Gl.Uniform1(textureLocation, 0);
+
+                Gl.ActiveTexture(TextureUnit.Texture0);
+                Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (float)GLEnum.Linear);
+                Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)GLEnum.Linear);
+                Gl.BindTexture(TextureTarget.Texture2D, fighterJets[i].Texture.Value);
+
+                Gl.DrawElements(GLEnum.Triangles, fighterJets[i].IndexArrayLength, GLEnum.UnsignedInt, null);
+                Gl.BindVertexArray(0);
+
+                CheckError();
+                Gl.BindTexture(TextureTarget.Texture2D, 0);
+                CheckError();
+            }
+        }
+        
         private static unsafe void SetModelMatrix(Matrix4X4<float> modelMatrix)
         {
             int location = Gl.GetUniformLocation(program, ModelMatrixVariableName);
@@ -390,13 +429,21 @@ namespace hijacking
             skyBox = GlCube.CreateInteriorCube(Gl);
             road = ObjResourceReader.CreateRoad(Gl);
             arrangementModel = new();
+            for (int i = 0; i < fighterJets.Length; i++)
+            {
+                fighterJets[i] = ObjResourceReader.CreateFighterJet(Gl);
+            }
         }
-
-        
 
         private static void Window_Closing()
         {
             airbus.ReleaseGlObject();
+            skyBox.ReleaseGlObject();
+            road.ReleaseGlObject();
+            for (int i = 0; i < fighterJets.Length; i++)
+            {
+                fighterJets[i].ReleaseGlObject();
+            }
         }
 
         private static unsafe void SetProjectionMatrix()

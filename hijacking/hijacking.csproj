@@ -35,6 +35,10 @@
       <EmbeddedResource Include="Resources\airbus\road.obj" />
       <None Remove="Resources\airbus\road texture.dds" />
       <EmbeddedResource Include="Resources\airbus\road.png" />
+      <None Remove="Resources\airbus\fighter.obj" />
+      <EmbeddedResource Include="Resources\airbus\fighter.obj" />
+      <None Remove="Resources\airbus\fighter_body.jpg" />
+      <EmbeddedResource Include="Resources\airbus\fighter_body.jpg" />
     </ItemGroup>
 
 </Project>
