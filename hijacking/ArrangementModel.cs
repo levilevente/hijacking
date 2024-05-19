@@ -30,10 +30,10 @@ namespace hijacking
 
         public void AdvanceTime()
         {
-            airplaneTranslation.Y += movementSpeed;
-            if (airplaneTranslation.Y > 10000)
+            airplaneTranslation.Z -= movementSpeed;
+            if (airplaneTranslation.Z > 10000)
             {
-                airplaneTranslation.Y = -10000;
+                airplaneTranslation.Z = -10000;
             }
         }
         

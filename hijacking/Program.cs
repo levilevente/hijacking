@@ -25,6 +25,10 @@ namespace hijacking
         
         private static GlObject airbus;
         
+        private static GlObject[] fighterJets = new GlObject[3];
+        
+        private static GlObject road;
+        
         private static GlCube skyBox;
 
         private static float Shininess = 50;
@@ -46,7 +50,7 @@ namespace hijacking
         static void Main(string[] args)
         {
             WindowOptions windowOptions = WindowOptions.Default;
-            windowOptions.Title = "2 szeminárium";
+            windowOptions.Title = "Levi naon meno projektje";
             windowOptions.Size = new Vector2D<int>(1000, 1000);
 
             // on some systems there is no depth buffer by default, so we need to make sure one is created
@@ -138,29 +142,24 @@ namespace hijacking
             switch (key)
             {
                 case Key.Left:
-                    cameraDescriptor.DecreaseZYAngle();
+                    cameraDescriptor.RotateLeft();
                     break;
-                    ;
                 case Key.Right:
-                    cameraDescriptor.IncreaseZYAngle();
+                    cameraDescriptor.RotateRight();
                     break;
                 case Key.Down:
-                    cameraDescriptor.IncreaseDistance();
+                    cameraDescriptor.RotateDown();
                     break;
                 case Key.Up:
-                    cameraDescriptor.DecreaseDistance();
+                    cameraDescriptor.RotateUp();
                     break;
-                case Key.U:
-                    cameraDescriptor.IncreaseZXAngle();
+                case Key.A:
+                    arrangementModel.TurnLeft();
+                    cameraDescriptor.MoveLeft();
                     break;
                 case Key.D:
-                    cameraDescriptor.DecreaseZXAngle();
-                    break;
-                case Key.Q:
-                    arrangementModel.TurnLeft();
-                    break;
-                case Key.W:
                     arrangementModel.TurnRight();
+                    cameraDescriptor.MoveRight();
                     break;
             }
         }
@@ -172,7 +171,8 @@ namespace hijacking
             // make sure it is threadsafe
             // NO GL calls
             arrangementModel.AdvanceTime();
-            
+            cameraDescriptor.MoveForward();
+
 
             controller.Update((float)deltaTime);
         }
@@ -197,11 +197,8 @@ namespace hijacking
             SetShininess();
 
             DrawAirbus();
-            
-            // add a constant to airbus position to move it forward (add to z coordinate of the position)
-
-            
             DrawSkyBox();
+            DrawRoad();
 
             //ImGuiNET.ImGui.ShowDemoWindow();
             ImGuiNET.ImGui.Begin("Lighting properties",
@@ -233,6 +230,33 @@ namespace hijacking
             Gl.BindTexture(TextureTarget.Texture2D, skyBox.Texture.Value);
 
             Gl.DrawElements(GLEnum.Triangles, skyBox.IndexArrayLength, GLEnum.UnsignedInt, null);
+            Gl.BindVertexArray(0);
+
+            CheckError();
+            Gl.BindTexture(TextureTarget.Texture2D, 0);
+            CheckError();
+        }
+        
+        private static unsafe void DrawRoad()
+        {
+            Matrix4X4<float> modelMatrix = Matrix4X4.CreateScale(10000f);
+            SetModelMatrix(modelMatrix);
+            Gl.BindVertexArray(road.Vao);
+
+            int textureLocation = Gl.GetUniformLocation(program, TextureUniformVariableName);
+            if (textureLocation == -1)
+            {
+                throw new Exception($"{TextureUniformVariableName} uniform not found on shader.");
+            }
+            // set texture 0
+            Gl.Uniform1(textureLocation, 0);
+
+            Gl.ActiveTexture(TextureUnit.Texture0);
+            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (float)GLEnum.Linear);
+            Gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)GLEnum.Linear);
+            Gl.BindTexture(TextureTarget.Texture2D, road.Texture.Value);
+
+            Gl.DrawElements(GLEnum.Triangles, road.IndexArrayLength, GLEnum.UnsignedInt, null);
             Gl.BindVertexArray(0);
 
             CheckError();
@@ -298,7 +322,9 @@ namespace hijacking
 
 
             var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.airplaneTranslation);
+            //var rotationMatrix = Matrix4X4.CreateRotationX((float)-Math.PI/2);
             var modelMatrixForCenterCube = translationMatrix;
+            //var modelMatrixForCenterCube = translationMatrix;
             SetModelMatrix(modelMatrixForCenterCube);
             Gl.BindVertexArray(airbus.Vao);
             
@@ -362,7 +388,7 @@ namespace hijacking
         {
             airbus = ObjResourceReader.CreateAirbus(Gl);
             skyBox = GlCube.CreateInteriorCube(Gl);
-            
+            road = ObjResourceReader.CreateRoad(Gl);
             arrangementModel = new();
         }
 

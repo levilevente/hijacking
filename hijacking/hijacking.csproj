@@ -31,6 +31,10 @@
       <EmbeddedResource Include="Shaders\FragmentShader.frag" />
       <None Remove="Shaders\VertexShader.vert" />
       <EmbeddedResource Include="Shaders\VertexShader.vert" />
+      <None Remove="Resources\airbus\road.obj" />
+      <EmbeddedResource Include="Resources\airbus\road.obj" />
+      <None Remove="Resources\airbus\road texture.dds" />
+      <EmbeddedResource Include="Resources\airbus\road.png" />
     </ItemGroup>
 
 </Project>
