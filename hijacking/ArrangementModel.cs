@@ -17,15 +17,10 @@ namespace hijacking
         {
             airplaneTranslation = new Vector3D<float>(0, 0, 0);
             Random r = new Random();
-            int r_x = r.Next(-3000, 3000);
             int r_z = r.Next(-3000, 3000);
-            roadPosition = new Vector3D<float>(r_x, -1000, r_z);
+            roadPosition = new Vector3D<float>(20000, -1000, r_z);
             aircraftPosition = new Vector3D<float>[4];
-            
-            for (int i = 0; i < aircraftPosition.Length; i++)
-            {
-                aircraftPosition[i] = new Vector3D<float>(0, 0, 0);
-            }
+
 
             aircraftPosition[0] = new Vector3D<float>(700, 0, 700);
             aircraftPosition[1] = new Vector3D<float>(-700, 0, 700);

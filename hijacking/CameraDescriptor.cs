@@ -6,8 +6,13 @@ namespace hijacking
         private const double AngleChangeStepSize = Math.PI / 180 * 5;
         private const float MoveSpeed = 0.9f;
 
-        public Vector3D<float> Position { get; private set; } = new Vector3D<float>(0.0f, 5000.0f, 5000.0f);
+        public Vector3D<float> Position { get; private set; } = new Vector3D<float>(0.0f, 1000.0f, 2000.0f);
 
+        // repulo elore megy z -
+        //repulo hata megy z +
+        //repulo balra megy x -
+        //repulo jobbra megy x +
+        
         public Vector3D<float> UpVector { get; private set; } = new Vector3D<float>(0, 1, 0);
 
         public Vector3D<float> Target { get; private set; } = new Vector3D<float>(0.0f, 0.0f, -1600.0f);
@@ -54,20 +59,29 @@ namespace hijacking
 
         private void RotateAroundUpVector(float angle)
         {
+            var forward = Target - Position;
             var rotate = Matrix4X4.CreateFromAxisAngle(UpVector, angle);
-            var forward = ForwardVector;
             forward = Vector3D.Transform(forward, rotate);
             Target = Position + forward;
         }
-
+        
+        /*
+        private void RotateAroundUpVector(float angle)
+        {
+            var rotate = Matrix4X4.CreateFromAxisAngle(UpVector, angle);
+            var forward = Target - Position;
+            forward = Vector3D.Transform(forward, rotate);
+            Target += forward;
+        }
+*/
         public void RotateUp()
         {
-            RotateAroundRightVector(-(float)AngleChangeStepSize);
+            RotateAroundRightVector((float)AngleChangeStepSize);
         }
 
         public void RotateDown()
         {
-            RotateAroundRightVector((float)AngleChangeStepSize);
+            RotateAroundRightVector(-(float)AngleChangeStepSize);
         }
 
         private void RotateAroundRightVector(float angle)
@@ -75,12 +89,25 @@ namespace hijacking
             var right = Vector3D.Cross(ForwardVector, UpVector);
             right = Vector3D.Normalize(right);
             var rotate = Matrix4X4.CreateFromAxisAngle(right, angle);
-            var forward = ForwardVector;
+
+            var forward = Target - Position;
+
             forward = Vector3D.Transform(forward, rotate);
+
             Target = Position + forward;
+        }
+        /*
+        private void RotateAroundRightVector(float angle)
+        {
+            var right = Vector3D.Cross(ForwardVector, UpVector);
+            right = Vector3D.Normalize(right);
+            var rotate = Matrix4X4.CreateFromAxisAngle(right, angle);
+            var forward = Target - Position;
+            forward = Vector3D.Transform(forward, rotate);
+            Target += forward;
 
             // Update the UpVector to ensure it remains orthogonal to the ForwardVector
-            UpVector = Vector3D.Normalize(Vector3D.Cross(right, forward));
-        }
+            //UpVector = Vector3D.Normalize(Vector3D.Cross(right, forward));
+        }*/
     }
 }

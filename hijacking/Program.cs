@@ -171,7 +171,7 @@ namespace hijacking
             // make sure it is threadsafe
             // NO GL calls
             arrangementModel.AdvanceTime();
-            //cameraDescriptor.MoveForward();
+            cameraDescriptor.MoveForward();
 
 
             controller.Update((float)deltaTime);
