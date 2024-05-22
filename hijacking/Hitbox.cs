@@ -1,64 +1,21 @@
-namespace hijacking
+public class Hitbox
 {
-    public class Hitbox
+    private (int x, int y, int z) topLeft;
+    private (int x, int y, int z) bottomRight;
+
+    public Hitbox((int x, int y, int z) topLeft, (int x, int y, int z) bottomRight)
     {
-        private int x1;
-        private int x2;
-        private int y1;
-        private int y2;
-        
-        public Hitbox(int x1, int x2, int y1, int y2)
-        {
-            this.x1 = x1;
-            this.x2 = x2;
-            this.y1 = y1;
-            this.y2 = y2;
-        }
-        
-        public void setX1(int x1)
-        {
-            this.x1 = x1;
-        }
-        
-        public void setX2(int x2)
-        {
-            this.x2 = x2;
-        }
-        
-        public void setY1(int y1)
-        {
-            this.y1 = y1;
-        }
-        
-        public void setY2(int y2)
-        {
-            this.y2 = y2;
-        }
-        
-        public int getX1()
-        {
-            return x1;
-        }
-        
-        public int getX2()
-        {
-            return x2;
-        }
-        
-        public int getY1()
-        {
-            return y1;
-        }
-        
-        public int getY2()
-        {
-            return y2;
-        }
-        
-        public bool isColliding(Hitbox other)
-        {
-            return x1 < other.getX2() && x2 > other.getX1() && y1 < other.getY2() && y2 > other.getY1();
-        }
+        this.topLeft = topLeft;
+        this.bottomRight = bottomRight;
     }
-    
+
+    public bool IsColliding(Hitbox other)
+    {
+        return this.topLeft.x < other.bottomRight.x &&
+               this.bottomRight.x > other.topLeft.x &&
+               this.topLeft.y < other.bottomRight.y &&
+               this.bottomRight.y > other.topLeft.y &&
+               this.topLeft.z < other.bottomRight.z &&
+               this.bottomRight.z > other.topLeft.z;
+    }
 }

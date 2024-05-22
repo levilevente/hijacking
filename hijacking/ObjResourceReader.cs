@@ -16,8 +16,9 @@ namespace hijacking
             List<(int Vertex, int Texture,int Normal)[]> objFaces;
             List<float[]> objNormals;
             List<float[]> objTextures;
+            Hitbox hitbox;
             
-            ReadObjDataForAirbus(out objVertices, out objFaces, out objNormals, out objTextures);
+            ReadObjDataForAirbus(out objVertices, out objFaces, out objNormals, out objTextures, out hitbox);
 
             List<float> glVertices = new List<float>();
             List<float> glColors = new List<float>();
@@ -25,7 +26,29 @@ namespace hijacking
 
             CreateGlArraysFromObjArrays(objVertices, objFaces, objNormals, objTextures, glVertices, glColors, glIndices);
 
-            return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "body.png");
+            return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "body.png", hitbox);
+        }
+        public static unsafe GlObject CreateRoad(GL Gl)
+        {
+            uint vao = Gl.GenVertexArray();
+            Gl.BindVertexArray(vao);
+            int wingIndex = 0;
+
+            List<float[]> objVertices;
+            List<(int Vertex, int Texture,int Normal)[]> objFaces;
+            List<float[]> objNormals;
+            List<float[]> objTextures;
+            Hitbox hitbox;
+            
+            ReadObjDataForRoad(out objVertices, out objFaces, out objNormals, out objTextures, out hitbox);
+
+            List<float> glVertices = new List<float>();
+            List<float> glColors = new List<float>();
+            List<uint> glIndices = new List<uint>();
+
+            CreateGlArraysFromObjArrays(objVertices, objFaces, objNormals, objTextures, glVertices, glColors, glIndices);
+
+            return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "road.png", hitbox);
         }
 
         public static unsafe GlObject CreateFighterJet(GL Gl)
@@ -37,8 +60,9 @@ namespace hijacking
             List<(int Vertex, int Texture,int Normal)[]> objFaces;
             List<float[]> objNormals;
             List<float[]> objTextures;
+            Hitbox hitbox;
             
-            ReadObjDataForFighter(out objVertices, out objFaces, out objNormals, out objTextures);
+            ReadObjDataForFighter(out objVertices, out objFaces, out objNormals, out objTextures, out hitbox);
 
             List<float> glVertices = new List<float>();
             List<float> glColors = new List<float>();
@@ -46,10 +70,10 @@ namespace hijacking
 
             CreateGlArraysFromObjArrays(objVertices, objFaces, objNormals, objTextures, glVertices, glColors, glIndices);
 
-            return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "fighter_body.jpg");
+            return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "fighter_body.jpg", hitbox);
         }
 
-        private static unsafe GlObject CreateOpenGlObject(GL Gl, uint vao, List<float> glVertices, List<float> glColors, List<uint> glIndices, String textureFile)
+        private static unsafe GlObject CreateOpenGlObject(GL Gl, uint vao, List<float> glVertices, List<float> glColors, List<uint> glIndices, String textureFile, Hitbox hitbox = null)
         {
             uint offsetPos = 0;
             uint offsetNormal = offsetPos + (3 * sizeof(float));
@@ -100,7 +124,7 @@ namespace hijacking
             uint indexArrayLength = (uint)glIndices.ToArray().Length;
 
 
-            return new GlObject(vao, vertices, colors, indices, indexArrayLength, Gl, texture);
+            return new GlObject(vao, vertices, colors, indices, indexArrayLength, Gl, texture, hitbox);
         }
 
         private static unsafe void CreateGlArraysFromObjArrays(List<float[]> objVertices, List<(int Vertex, int Texture,int Normal)[]> objFaces, List<float[]>objNormals, List<float[]>objTextures, List<float> glVertices, List<float> glColors, List<uint> glIndices)
@@ -149,13 +173,20 @@ namespace hijacking
             glIndices.Add((uint)glVertexIndices[glVertexStringKey]);
         }
 
-        private static unsafe void ReadObjDataForAirbus(out List<float[]> objVertices, out List<(int Vertex, int Texture,int Normal)[]> objFaces, out List<float[]>objNormals, out List<float[]>objTextures)
+        private static unsafe void ReadObjDataForAirbus(out List<float[]> objVertices, out List<(int Vertex, int Texture,int Normal)[]> objFaces, out List<float[]>objNormals, out List<float[]>objTextures, out Hitbox hitbox)
         {
             objVertices = new List<float[]>();
             objFaces = new List<(int Vertex, int Texture,int Normal)[]>();
             objNormals = new List<float[]>();
             objTextures = new List<float[]>();
 
+            int max_x = -100000;
+            int max_y = -100000;
+            int max_z = -100000;
+            int min_x = 100000;
+            int min_y = 100000;
+            int min_z = 100000;
+            
 
             using (Stream objStream = typeof(ObjResourceReader).Assembly.GetManifestResourceStream("hijacking.Resources.airbus.plane.obj"))
             using (StreamReader objReader = new StreamReader(objStream))
@@ -187,7 +218,18 @@ namespace hijacking
                                 for (int i = 0; i < vertex.Length; ++i)
                                     vertex[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture);
                                 objVertices.Add(vertex);
-                                
+                                if (vertex[0] > max_x)
+                                    max_x = (int)vertex[0];
+                                if (vertex[1] > max_y)
+                                    max_y = (int)vertex[1];
+                                if (vertex[2] > max_z)
+                                    max_z = (int)vertex[2];
+                                if (vertex[0] < min_x)
+                                    min_x = (int)vertex[0];
+                                if (vertex[1] < min_y)
+                                    min_y = (int)vertex[1];
+                                if (vertex[2] < min_z)
+                                    min_z = (int)vertex[2];
                                 break;
                             case "f":
                                 (int Vertex, int Texture,int Normal)[] face = new (int Vertex, int Texture,int Normal)[4];
@@ -213,15 +255,21 @@ namespace hijacking
                 } 
                 
             }
+            hitbox = new Hitbox((min_x, min_y, min_z), (max_x, max_y, max_z));
         }
         
-        
-        private static unsafe void ReadObjDataForFighter(out List<float[]> objVertices, out List<(int Vertex, int Texture,int Normal)[]> objFaces, out List<float[]>objNormals, out List<float[]>objTextures)
+        private static unsafe void ReadObjDataForFighter(out List<float[]> objVertices, out List<(int Vertex, int Texture,int Normal)[]> objFaces, out List<float[]>objNormals, out List<float[]>objTextures, out Hitbox hitbox)
         {
             objVertices = new List<float[]>();
             objFaces = new List<(int Vertex, int Texture,int Normal)[]>();
             objNormals = new List<float[]>();
             objTextures = new List<float[]>();
+            int max_x = -100000;
+            int max_y = -100000;
+            int max_z = -100000;
+            int min_x = 100000;
+            int min_y = 100000;
+            int min_z = 100000;
 
 
             using (Stream objStream = typeof(ObjResourceReader).Assembly.GetManifestResourceStream("hijacking.Resources.airbus.fighter.obj"))
@@ -242,7 +290,18 @@ namespace hijacking
                                 for (int i = 0; i < vertex.Length; ++i)
                                     vertex[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture) * 100;
                                 objVertices.Add(vertex);
-                                
+                                if (vertex[0] > max_x)
+                                    max_x = (int)vertex[0];
+                                if (vertex[1] > max_y)
+                                    max_y = (int)vertex[1];
+                                if (vertex[2] > max_z)
+                                    max_z = (int)vertex[2];
+                                if (vertex[0] < min_x)
+                                    min_x = (int)vertex[0];
+                                if (vertex[1] < min_y)
+                                    min_y = (int)vertex[1];
+                                if (vertex[2] < min_z)
+                                    min_z = (int)vertex[2];
                                 break;
                             case "f":
                                 (int Vertex, int Texture,int Normal)[] face = new (int Vertex, int Texture,int Normal)[4];
@@ -268,48 +327,20 @@ namespace hijacking
                 } 
                 
             }
+            hitbox = new Hitbox((min_x, min_y, min_z), (max_x, max_y, max_z));
         }
-        
-        private static unsafe ImageResult ReadTextureImage(string textureResource)
-        {
-            ImageResult result;
-            using (Stream skyeboxStream
-                   = typeof(GlCube).Assembly.GetManifestResourceStream("hijacking.Resources.airbus." + textureResource))
-                result = ImageResult.FromStream(skyeboxStream, ColorComponents.RedGreenBlueAlpha);
-
-            return result;
-        }
-
-        public static unsafe GlObject CreateRoad(GL Gl)
-        {
-            uint vao = Gl.GenVertexArray();
-            Gl.BindVertexArray(vao);
-            int wingIndex = 0;
-
-            List<float[]> objVertices;
-            List<(int Vertex, int Texture,int Normal)[]> objFaces;
-            List<float[]> objNormals;
-            List<float[]> objTextures;
-            
-            ReadObjDataForRoad(out objVertices, out objFaces, out objNormals, out objTextures);
-
-            List<float> glVertices = new List<float>();
-            List<float> glColors = new List<float>();
-            List<uint> glIndices = new List<uint>();
-
-            CreateGlArraysFromObjArrays(objVertices, objFaces, objNormals, objTextures, glVertices, glColors, glIndices);
-
-            return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "road.png");
-        }
-        
-        private static unsafe void ReadObjDataForRoad(out List<float[]> objVertices, out List<(int Vertex, int Texture,int Normal)[]> objFaces, out List<float[]>objNormals, out List<float[]>objTextures)
+        private static unsafe void ReadObjDataForRoad(out List<float[]> objVertices, out List<(int Vertex, int Texture,int Normal)[]> objFaces, out List<float[]>objNormals, out List<float[]>objTextures, out Hitbox hitbox)
         {
             objVertices = new List<float[]>();
             objFaces = new List<(int Vertex, int Texture,int Normal)[]>();
             objNormals = new List<float[]>();
             objTextures = new List<float[]>();
-
-
+            int max_x = -100000;
+            int max_y = -100000;
+            int max_z = -100000;
+            int min_x = 100000;
+            int min_y = 100000;
+            int min_z = 100000;
             using (Stream objStream = typeof(ObjResourceReader).Assembly.GetManifestResourceStream("hijacking.Resources.airbus.road.obj"))
             using (StreamReader objReader = new StreamReader(objStream))
             {
@@ -333,7 +364,18 @@ namespace hijacking
                                 for (int i = 0; i < vertex.Length; ++i)
                                     vertex[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture) * 300;
                                 objVertices.Add(vertex);
-                                
+                                if (vertex[0] > max_x)
+                                    max_x = (int)vertex[0];
+                                if (vertex[1] > max_y)
+                                    max_y = (int)vertex[1];
+                                if (vertex[2] > max_z)
+                                    max_z = (int)vertex[2];
+                                if (vertex[0] < min_x)
+                                    min_x = (int)vertex[0];
+                                if (vertex[1] < min_y)
+                                    min_y = (int)vertex[1];
+                                if (vertex[2] < min_z)
+                                    min_z = (int)vertex[2];
                                 break;
                             case "f":
                                 (int Vertex, int Texture,int Normal)[] face = new (int Vertex, int Texture,int Normal)[4];
@@ -359,7 +401,20 @@ namespace hijacking
                 } 
                 
             }
+            hitbox = new Hitbox((min_x, min_y, min_z), (max_x, max_y, max_z));
         }
+        
+        private static unsafe ImageResult ReadTextureImage(string textureResource)
+        {
+            ImageResult result;
+            using (Stream skyeboxStream
+                   = typeof(GlCube).Assembly.GetManifestResourceStream("hijacking.Resources.airbus." + textureResource))
+                result = ImageResult.FromStream(skyeboxStream, ColorComponents.RedGreenBlueAlpha);
+
+            return result;
+        }
+
+        
 
         
     }
