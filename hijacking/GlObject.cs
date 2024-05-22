@@ -16,7 +16,7 @@ namespace hijacking
         
         private Hitbox Hitbox;
 
-        public GlObject(uint vao, uint vertices, uint colors, uint indeces, uint indexArrayLength, GL gl, uint texture = 0)
+        public GlObject(uint vao, uint vertices, uint colors, uint indeces, uint indexArrayLength, GL gl, uint texture = 0, Hitbox hitbox = null)
         {
             this.Vao = vao;
             this.Vertices = vertices;
@@ -25,6 +25,7 @@ namespace hijacking
             this.IndexArrayLength = indexArrayLength;
             this.Gl = gl;
             Texture = texture;
+            this.Hitbox = hitbox;
         }
 
         internal void ReleaseGlObject()

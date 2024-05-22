@@ -161,6 +161,9 @@ namespace hijacking
                     arrangementModel.TurnRight();
                     cameraDescriptor.MoveRight();
                     break;
+                case Key.Space:
+                    arrangementModel.setLand();
+                    break;
             }
         }
 

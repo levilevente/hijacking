@@ -12,13 +12,17 @@ namespace hijacking
         public Vector3D<float> airplaneTranslation;
         public Vector3D<float>[] aircraftPosition;
         public Vector3D<float> roadPosition;
+
+        private bool land = false;
+
+        private Random r;
         
         public ArrangementModel()
         {
             airplaneTranslation = new Vector3D<float>(0, 0, 0);
-            Random r = new Random();
+            r = new Random();
             int r_z = r.Next(-3000, 3000);
-            roadPosition = new Vector3D<float>(20000, -1000, r_z);
+            roadPosition = new Vector3D<float>(r_z, -1000, -18000);
             aircraftPosition = new Vector3D<float>[4];
 
 
@@ -31,18 +35,54 @@ namespace hijacking
         public void AdvanceTime()
         {
             airplaneTranslation.Z -= movementSpeed;
-            if (airplaneTranslation.Z > 10000)
-            {
-                airplaneTranslation.Z = -10000;
-            }
+            
             for (int i = 0; i < aircraftPosition.Length; i++)
             {
                 aircraftPosition[i].Z -= movementSpeed;
-                if (aircraftPosition[i].Z > 10000)
-                {
-                    aircraftPosition[i].Z = -10000;
-                }
             }
+
+            if (aircraftPosition[0].X < roadPosition.X + 700)
+            {
+                aircraftPosition[0].X += 0.4f;
+            }
+            else if (aircraftPosition[0].X > roadPosition.X + 700)
+            {
+                aircraftPosition[0].X -= 0.4f;
+            }
+            
+            if (aircraftPosition[1].X < roadPosition.X - 700)
+            {
+                aircraftPosition[1].X += 0.4f;
+            }
+            else if (aircraftPosition[1].X > roadPosition.X - 700)
+            {
+                aircraftPosition[1].X -= 0.4f;
+            }
+            
+            if (aircraftPosition[2].X < roadPosition.X - 700)
+            {
+                aircraftPosition[2].X += 0.4f;
+            }
+            else if (aircraftPosition[2].X > roadPosition.X - 700)
+            {
+                aircraftPosition[2].X -= 0.4f;
+            }
+            
+            if (aircraftPosition[3].X < roadPosition.X + 700)
+            {
+                aircraftPosition[3].X += 0.4f;
+            }
+            else if (aircraftPosition[3].X > roadPosition.X + 700)
+            {
+                aircraftPosition[3].X -= 0.4f;
+            }
+            
+            if (land)
+            {
+                airplaneTranslation.Y -= 0.5f;
+            }
+            
+            // if the airpalne position hit the road rane we stop the airplane
         }
         
         public void TurnLeft()
@@ -61,6 +101,11 @@ namespace hijacking
             {
                 airplaneTranslation.X = -10000;
             }
+        }
+        
+        public void setLand()
+        {
+            this.land = true;
         }
         
     }

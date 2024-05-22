@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("hijacking")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ad37bee89d8e0ecc7e4845d278f30bba706ddae2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+195b1b2576bb054c2bd2c1b89ff8a3ec3a887e58")]
 [assembly: System.Reflection.AssemblyProductAttribute("hijacking")]
 [assembly: System.Reflection.AssemblyTitleAttribute("hijacking")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
