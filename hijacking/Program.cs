@@ -437,7 +437,6 @@ namespace hijacking
                 fighterJets[i] = ObjResourceReader.CreateFighterJet(Gl);
             }
         }
-
         private static void Window_Closing()
         {
             airbus.ReleaseGlObject();
