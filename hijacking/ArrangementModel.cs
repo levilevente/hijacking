@@ -4,9 +4,6 @@ namespace hijacking
 {
     internal class ArrangementModel
     {
-        private static float leftBound = -100f;
-        private static float rightBound = 100f;
-
         private static float movementSpeed = 0.9f;
 
         public Vector3D<float> airplaneTranslation;
@@ -21,11 +18,10 @@ namespace hijacking
         {
             airplaneTranslation = new Vector3D<float>(0, 0, 0);
             r = new Random();
-            int r_z = r.Next(-3000, 3000);
-            roadPosition = new Vector3D<float>(r_z, -1000, -18000);
+            int r_x = r.Next(-3000, 3000);
+            roadPosition = new Vector3D<float>(r_x, -1000, -18000);
             aircraftPosition = new Vector3D<float>[4];
-
-
+            
             aircraftPosition[0] = new Vector3D<float>(700, 0, 700);
             aircraftPosition[1] = new Vector3D<float>(-700, 0, 700);
             aircraftPosition[2] = new Vector3D<float>(-700, 0, -700);

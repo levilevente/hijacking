@@ -187,6 +187,8 @@ namespace hijacking
             int min_y = 100000;
             int min_z = 100000;
             
+            bool foundAirplaneWings = false;
+            
 
             using (Stream objStream = typeof(ObjResourceReader).Assembly.GetManifestResourceStream("hijacking.Resources.airbus.plane.obj"))
             using (StreamReader objReader = new StreamReader(objStream))
@@ -194,12 +196,10 @@ namespace hijacking
                 while (!objReader.EndOfStream)
                 {
                     var line = objReader.ReadLine().Replace("  ", " ");
-                    if (line.Trim().StartsWith("# object airplane_body"))
-                    {
-                        Console.WriteLine("Found airplane_body");
-                    } else if (line.Trim().StartsWith("# object airplane_wings"))
+                    if (line.Trim().StartsWith("g _1"))
                     {
                         Console.WriteLine("Found airplane_wings");
+                        foundAirplaneWings = true;
                     }
                     if (String.IsNullOrEmpty(line) || line.Trim().StartsWith("#"))
                         continue;
@@ -218,18 +218,21 @@ namespace hijacking
                                 for (int i = 0; i < vertex.Length; ++i)
                                     vertex[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture);
                                 objVertices.Add(vertex);
-                                if (vertex[0] > max_x)
-                                    max_x = (int)vertex[0];
-                                if (vertex[1] > max_y)
-                                    max_y = (int)vertex[1];
-                                if (vertex[2] > max_z)
-                                    max_z = (int)vertex[2];
-                                if (vertex[0] < min_x)
-                                    min_x = (int)vertex[0];
-                                if (vertex[1] < min_y)
-                                    min_y = (int)vertex[1];
-                                if (vertex[2] < min_z)
-                                    min_z = (int)vertex[2];
+                                if (!foundAirplaneWings)
+                                {
+                                    if (vertex[0] > max_x)
+                                        max_x = (int)vertex[0];
+                                    if (vertex[1] > max_y)
+                                        max_y = (int)vertex[1];
+                                    if (vertex[2] > max_z)
+                                        max_z = (int)vertex[2];
+                                    if (vertex[0] < min_x)
+                                        min_x = (int)vertex[0];
+                                    if (vertex[1] < min_y)
+                                        min_y = (int)vertex[1];
+                                    if (vertex[2] < min_z)
+                                        min_z = (int)vertex[2];    
+                                }
                                 break;
                             case "f":
                                 (int Vertex, int Texture,int Normal)[] face = new (int Vertex, int Texture,int Normal)[4];
@@ -251,9 +254,7 @@ namespace hijacking
                                 break;
                         }    
                     }
-                    
-                } 
-                
+                }
             }
             hitbox = new Hitbox((min_x, min_y, min_z), (max_x, max_y, max_z));
         }

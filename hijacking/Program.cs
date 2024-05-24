@@ -169,16 +169,30 @@ namespace hijacking
 
         private static void Window_Update(double deltaTime)
         {
-            //Console.WriteLine($"Update after {deltaTime} [s].");
             // multithreaded
             // make sure it is threadsafe
             // NO GL calls
             arrangementModel.AdvanceTime();
             cameraDescriptor.MoveForward();
 
+            Vector3D<float> airbusPosition = arrangementModel.airplaneTranslation;
+            Hitbox airbusHitbox = airbus.Hitbox.Translated(airbusPosition);
+
+            for (int i = 0; i < 4; i++)
+            {
+                Vector3D<float> jetPosition = arrangementModel.aircraftPosition[i];
+                Hitbox jetHitbox = fighterJets[i].Hitbox.Translated(jetPosition);
+
+                if (airbusHitbox.IsColliding(jetHitbox))
+                {
+                    Console.WriteLine($"Airbus collided with fighter jet: {i}");
+                }
+            }
 
             controller.Update((float)deltaTime);
         }
+
+
 
         private static unsafe void Window_Render(double deltaTime)
         {

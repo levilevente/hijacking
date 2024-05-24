@@ -14,7 +14,7 @@ namespace hijacking
 
         private GL Gl;
         
-        private Hitbox Hitbox;
+        public Hitbox Hitbox;
 
         public GlObject(uint vao, uint vertices, uint colors, uint indeces, uint indexArrayLength, GL gl, uint texture = 0, Hitbox hitbox = null)
         {
