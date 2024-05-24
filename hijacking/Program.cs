@@ -186,6 +186,7 @@ namespace hijacking
                 if (airbusHitbox.IsColliding(jetHitbox))
                 {
                     Console.WriteLine($"Airbus collided with fighter jet: {i}");
+                    arrangementModel.setColiding();
                 }
             }
 

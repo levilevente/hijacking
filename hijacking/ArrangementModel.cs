@@ -13,6 +13,8 @@ namespace hijacking
         private bool land = false;
 
         private Random r;
+
+        private bool coliding = false;
         
         public ArrangementModel()
         {
@@ -30,6 +32,10 @@ namespace hijacking
 
         public void AdvanceTime()
         {
+            if (coliding)
+            {
+                return;
+            }
             airplaneTranslation.Z -= movementSpeed;
             
             for (int i = 0; i < aircraftPosition.Length; i++)
@@ -83,6 +89,10 @@ namespace hijacking
         
         public void TurnLeft()
         {
+            if (coliding)
+            {
+                return;
+            }
             airplaneTranslation.X -= 10.0f;
             if (airplaneTranslation.X < -10000)
             {
@@ -92,6 +102,10 @@ namespace hijacking
         
         public void TurnRight()
         {
+            if (coliding)
+            {
+                return;
+            }
             airplaneTranslation.X += 10.0f;
             if (airplaneTranslation.X > 10000)
             {
@@ -102,6 +116,11 @@ namespace hijacking
         public void setLand()
         {
             this.land = true;
+        }
+        
+        public void setColiding()
+        {
+            this.coliding = true;
         }
         
     }
