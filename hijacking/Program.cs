@@ -178,6 +178,16 @@ namespace hijacking
             Vector3D<float> airbusPosition = arrangementModel.airplaneTranslation;
             Hitbox airbusHitbox = airbus.Hitbox.Translated(airbusPosition);
 
+            if (!arrangementModel.getColiding())
+            {
+                Vector3D<float> roadPosition = arrangementModel.roadPosition;
+                Hitbox roadHitbox = road.Hitbox.Translated(roadPosition);
+                if (airbusHitbox.IsColliding(roadHitbox))
+                {
+                    Console.WriteLine("Airbus collided with road");
+                    arrangementModel.setColiding();
+                }
+            }
             for (int i = 0; i < 4; i++)
             {
                 Vector3D<float> jetPosition = arrangementModel.aircraftPosition[i];

@@ -363,7 +363,7 @@ namespace hijacking
                             case "v":
                                 float[] vertex = new float[3];
                                 for (int i = 0; i < vertex.Length; ++i)
-                                    vertex[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture) * 300;
+                                    vertex[i] = float.Parse(lineData[i], CultureInfo.InvariantCulture) * 400;
                                 objVertices.Add(vertex);
                                 if (vertex[0] > max_x)
                                     max_x = (int)vertex[0];

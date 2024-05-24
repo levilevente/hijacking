@@ -123,5 +123,9 @@ namespace hijacking
             this.coliding = true;
         }
         
+        public bool getColiding()
+        { 
+            return coliding;
+        }
     }
 }
