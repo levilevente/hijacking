@@ -35,6 +35,8 @@ namespace hijacking
 
         private static float viewerPositionSpeed = 0.09f;
 
+        private static float rotationAngle = 0f;
+
         private const string ModelMatrixVariableName = "uModel";
         private const string NormalMatrixVariableName = "uNormal";
         private const string ViewMatrixVariableName = "uView";
@@ -164,6 +166,7 @@ namespace hijacking
                     cameraDescriptor.MoveRight();
                     break;
                 case Key.Space:
+                    cameraDescriptor.SetLanding();
                     arrangementModel.setLand();
                     break;
             }
@@ -179,15 +182,15 @@ namespace hijacking
 
             Vector3D<float> airbusPosition = arrangementModel.airplaneTranslation;
             Hitbox airbusHitbox = airbus.Hitbox.Translated(airbusPosition);
-
-            if (!arrangementModel.getColiding())
+            
+            if (arrangementModel.getColifingWithFighterJet() == -1)
             {
                 Vector3D<float> roadPosition = arrangementModel.roadPosition;
                 Hitbox roadHitbox = road.Hitbox.Translated(roadPosition);
                 if (airbusHitbox.IsColliding(roadHitbox))
                 {
-                    Console.WriteLine("Airbus collided with road");
-                    arrangementModel.setColiding();
+                    arrangementModel.setColidingWithRoad();
+                    cameraDescriptor.SetColidingWithRoad();
                 }
             }
             for (int i = 0; i < 4; i++)
@@ -197,8 +200,8 @@ namespace hijacking
 
                 if (airbusHitbox.IsColliding(jetHitbox))
                 {
-                    Console.WriteLine($"Airbus collided with fighter jet: {i}");
-                    arrangementModel.setColiding();
+                    arrangementModel.setColidingWithFighterJet(i);
+                    cameraDescriptor.SetColidingWithFighterJets();
                 }
             }
 
@@ -369,12 +372,24 @@ namespace hijacking
         
         private static unsafe void DrawAirbus()
         {
-            var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.airplaneTranslation);
-            //var rotationMatrix = Matrix4X4.CreateRotationX((float)-Math.PI/2);
-            var modelMatrixForCenterCube = translationMatrix;
-            //var modelMatrixForCenterCube = translationMatrix;
-            SetModelMatrix(modelMatrixForCenterCube);
-            Gl.BindVertexArray(airbus.Vao);
+            if (arrangementModel.getColifingWithFighterJet() == -1)
+            {
+                var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.airplaneTranslation);
+                //var rotationMatrix = Matrix4X4.CreateRotationX((float)-Math.PI/2);
+                var modelMatrixForCenterCube = translationMatrix;
+                //var modelMatrixForCenterCube = translationMatrix;
+                SetModelMatrix(modelMatrixForCenterCube);
+                Gl.BindVertexArray(airbus.Vao);
+            }
+            else
+            {   
+                var lookDownRotationMatrix = Matrix4X4.CreateRotationX((float)-Math.PI / 2);
+                var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.airplaneTranslation);
+                var rotationMatrix = Matrix4X4.CreateRotationZ(rotationAngle);
+                var modelMatrixForCenterCube = rotationMatrix * lookDownRotationMatrix * translationMatrix;
+                SetModelMatrix(modelMatrixForCenterCube);
+                Gl.BindVertexArray(airbus.Vao);
+            }
             
             //var modelMatrixForTable = Matrix4X4.CreateScale(1f, 1f, 1f);
             //SetModelMatrix(modelMatrixForTable);
@@ -405,15 +420,27 @@ namespace hijacking
         
         private static unsafe void DrawFighter()
         {
+            rotationAngle += 0.02f;
             // set material uniform to rubber
             for (int i = 0; i < fighterJets.Length; i++)
             {
                 var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.aircraftPosition[i]);
-                //var rotationMatrix = Matrix4X4.CreateRotationX((float)-Math.PI/2);
-                var modelMatrixForCenterCube = translationMatrix;
-                //var modelMatrixForCenterCube = translationMatrix;
-                SetModelMatrix(modelMatrixForCenterCube);
-                Gl.BindVertexArray(fighterJets[i].Vao);
+
+                if (i == arrangementModel.getColifingWithFighterJet())
+                {
+                    // Apply rotation to the specific fighter jet
+                    var lookDownRotationMatrix = Matrix4X4.CreateRotationX((float)-Math.PI / 2);
+                    var rotationMatrix = Matrix4X4.CreateRotationZ(rotationAngle);  
+                    var modelMatrixForCenterCube = rotationMatrix * lookDownRotationMatrix * translationMatrix;
+                    SetModelMatrix(modelMatrixForCenterCube);
+                    Gl.BindVertexArray(fighterJets[i].Vao);
+                }
+                else
+                {
+                    var modelMatrixForCenterCube = translationMatrix;
+                    SetModelMatrix(modelMatrixForCenterCube);
+                    Gl.BindVertexArray(fighterJets[i].Vao);
+                }
             
                 //var modelMatrixForTable = Matrix4X4.CreateScale(1f, 1f, 1f);
                 //SetModelMatrix(modelMatrixForTable);

@@ -5,6 +5,7 @@ namespace hijacking
     internal class ArrangementModel
     {
         private static float movementSpeed = 0.9f;
+        private static float planeSpeed = 0.9f;
 
         public Vector3D<float> airplaneTranslation;
         public Vector3D<float>[] aircraftPosition;
@@ -14,7 +15,8 @@ namespace hijacking
 
         private Random r;
 
-        private bool coliding = false;
+        private bool colidingWithRoad = false;
+        private int colidingWithFighterJets = -1;
         
         public ArrangementModel()
         {
@@ -32,64 +34,42 @@ namespace hijacking
 
         public void AdvanceTime()
         {
-            if (coliding)
+            if (colidingWithFighterJets != -1)
             {
+                airplaneTranslation.Y -= movementSpeed;
+                aircraftPosition[colidingWithFighterJets].Y -= movementSpeed;
+                
+                for (int i = 0; i < aircraftPosition.Length; i++)
+                {
+                    if (i != colidingWithFighterJets)
+                    {
+                        aircraftPosition[i].Z -= movementSpeed;
+                    }
+                }
                 return;
             }
-            airplaneTranslation.Z -= movementSpeed;
-            
-            for (int i = 0; i < aircraftPosition.Length; i++)
-            {
-                aircraftPosition[i].Z -= movementSpeed;
-            }
 
-            if (aircraftPosition[0].X < roadPosition.X + 700)
+            if (colidingWithRoad)
             {
-                aircraftPosition[0].X += 0.4f;
-            }
-            else if (aircraftPosition[0].X > roadPosition.X + 700)
-            {
-                aircraftPosition[0].X -= 0.4f;
-            }
-            
-            if (aircraftPosition[1].X < roadPosition.X - 700)
-            {
-                aircraftPosition[1].X += 0.4f;
-            }
-            else if (aircraftPosition[1].X > roadPosition.X - 700)
-            {
-                aircraftPosition[1].X -= 0.4f;
+                moveFighterJets();
+                airplaneTranslation.Z -= planeSpeed;
+                planeSpeed *= 0.9991f;
+                return;
             }
             
-            if (aircraftPosition[2].X < roadPosition.X - 700)
-            {
-                aircraftPosition[2].X += 0.4f;
-            }
-            else if (aircraftPosition[2].X > roadPosition.X - 700)
-            {
-                aircraftPosition[2].X -= 0.4f;
-            }
+            airplaneTranslation.Z -= planeSpeed;
             
-            if (aircraftPosition[3].X < roadPosition.X + 700)
-            {
-                aircraftPosition[3].X += 0.4f;
-            }
-            else if (aircraftPosition[3].X > roadPosition.X + 700)
-            {
-                aircraftPosition[3].X -= 0.4f;
-            }
+            moveFighterJets();
             
             if (land)
             {
                 airplaneTranslation.Y -= 0.5f;
             }
-            
-            // if the airpalne position hit the road rane we stop the airplane
         }
         
         public void TurnLeft()
         {
-            if (coliding)
+            if (colidingWithFighterJets != -1)
             {
                 return;
             }
@@ -102,7 +82,7 @@ namespace hijacking
         
         public void TurnRight()
         {
-            if (coliding)
+            if (colidingWithFighterJets != -1)
             {
                 return;
             }
@@ -118,14 +98,68 @@ namespace hijacking
             this.land = true;
         }
         
-        public void setColiding()
+        public void setColidingWithFighterJet(int numberOfJet)
         {
-            this.coliding = true;
+            this.colidingWithFighterJets = numberOfJet;
+        }
+
+        public int getColifingWithFighterJet()
+        {
+            return this.colidingWithFighterJets;
         }
         
-        public bool getColiding()
-        { 
-            return coliding;
+        public void setColidingWithRoad()
+        {
+            this.colidingWithRoad = true;
+        }
+        
+        public bool getColidingWithRoad()
+        {
+            return this.colidingWithRoad;
+        }
+        
+        private void moveFighterJets()
+        {
+             for (int i = 0; i < aircraftPosition.Length; i++)
+             {
+                 aircraftPosition[i].Z -= movementSpeed;
+             }
+
+             if (aircraftPosition[0].X < roadPosition.X + 700)
+             {
+                 aircraftPosition[0].X += 0.4f;
+             }
+             else if (aircraftPosition[0].X > roadPosition.X + 700)
+             {
+                 aircraftPosition[0].X -= 0.4f;
+             }
+            
+             if (aircraftPosition[1].X < roadPosition.X - 700)
+             {
+                 aircraftPosition[1].X += 0.4f;
+             }
+             else if (aircraftPosition[1].X > roadPosition.X - 700)
+             {
+                 aircraftPosition[1].X -= 0.4f;
+             }
+            
+             if (aircraftPosition[2].X < roadPosition.X - 700)
+             {
+                 aircraftPosition[2].X += 0.4f;
+             }
+             else if (aircraftPosition[2].X > roadPosition.X - 700)
+             {
+                 aircraftPosition[2].X -= 0.4f;
+             }
+            
+             if (aircraftPosition[3].X < roadPosition.X + 700)
+             {
+                 aircraftPosition[3].X += 0.4f;
+             }
+             else if (aircraftPosition[3].X > roadPosition.X + 700)
+             {
+                 aircraftPosition[3].X -= 0.4f;
+             } 
         }
     }
 }

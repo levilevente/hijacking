@@ -4,9 +4,13 @@ namespace hijacking
     internal class CameraDescriptor
     {
         private const double AngleChangeStepSize = Math.PI / 180 * 5;
-        private const float MoveSpeed = 0.9f;
-        private static readonly Vector3D<float> PointOfView = new Vector3D<float>(0f, 971f, 2747f);
-
+        private float MoveSpeed = 0.9f;
+        private static readonly Vector3D<float> PointOfView = new Vector3D<float>(0f, 915f, 2747f);
+        private static readonly Vector3D<float> landingVector3D = new Vector3D<float>(0f, 0.5f, 0f);
+        
+        private bool landing = false;
+        private bool colidingWithRoad = false;
+        private bool colidingWithFighterJets = false;
         // TPV :
         public Vector3D<float> Position { get; private set; } = new Vector3D<float>(0.0f, 1000.0f, 2000.0f);
         // FPV:
@@ -25,28 +29,49 @@ namespace hijacking
 
         public void MoveForward()
         {
-            var direction = ForwardVector * MoveSpeed;
-            Position += direction;
-            Target += direction;
-        }
+            if (colidingWithFighterJets)
+            {
+                return;
+            }
 
-        public void MoveBackward()
-        {
-            var direction = ForwardVector * MoveSpeed;
-            Position -= direction;
-            Target -= direction;
+            if (colidingWithRoad)
+            {
+                MoveSpeed *= 0.9991f;
+                var direction = ForwardVector * MoveSpeed;
+                Position += direction;
+                Target += direction;
+                return;
+            }
+            else
+            {
+                var direction = ForwardVector * MoveSpeed;
+                Position += direction;
+                Target += direction;
+                if (landing)
+                {
+                    Position -= landingVector3D;
+                    Target -= landingVector3D;
+                }    
+            }
+            
         }
 
         public void MoveRight()
         {
-            //var right = Vector3D.Cross(UpVector, ForwardVector);
-            //right = Vector3D.Normalize(right) * MoveSpeed;
+            if (colidingWithRoad || colidingWithFighterJets)
+            {
+                return;
+            }
             Position = new Vector3D<float>(Position.X + 10f, Position.Y, Position.Z);
             Target = new Vector3D<float>(Target.X + 10f, Target.Y, Target.Z);
         }
 
         public void MoveLeft()
         {
+            if (colidingWithRoad || colidingWithFighterJets)
+            {
+                return;
+            }
             Position = new Vector3D<float>(Position.X - 10f, Position.Y, Position.Z);
             Target = new Vector3D<float>(Target.X - 10f, Target.Y, Target.Z);
         }
@@ -69,15 +94,6 @@ namespace hijacking
             Target = Position + forward;
         }
         
-        /*
-        private void RotateAroundUpVector(float angle)
-        {
-            var rotate = Matrix4X4.CreateFromAxisAngle(UpVector, angle);
-            var forward = Target - Position;
-            forward = Vector3D.Transform(forward, rotate);
-            Target += forward;
-        }
-*/
         public void RotateUp()
         {
             RotateAroundRightVector((float)AngleChangeStepSize);
@@ -100,19 +116,6 @@ namespace hijacking
 
             Target = Position + forward;
         }
-        /*
-        private void RotateAroundRightVector(float angle)
-        {
-            var right = Vector3D.Cross(ForwardVector, UpVector);
-            right = Vector3D.Normalize(right);
-            var rotate = Matrix4X4.CreateFromAxisAngle(right, angle);
-            var forward = Target - Position;
-            forward = Vector3D.Transform(forward, rotate);
-            Target += forward;
-
-            // Update the UpVector to ensure it remains orthogonal to the ForwardVector
-            //UpVector = Vector3D.Normalize(Vector3D.Cross(right, forward));
-        }*/
 
         public void SetTPV()
         {
@@ -122,6 +125,21 @@ namespace hijacking
         public void SetFPV()
         {
             Position -= PointOfView;
+        }
+        
+        public void SetLanding()
+        {
+           landing = true;
+        }
+        
+        public void SetColidingWithRoad()
+        {
+            colidingWithRoad = true;
+        }
+        
+        public void SetColidingWithFighterJets()
+        {
+            colidingWithFighterJets = true;
         }
     }
 }
