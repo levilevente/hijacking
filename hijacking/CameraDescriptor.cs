@@ -5,8 +5,12 @@ namespace hijacking
     {
         private const double AngleChangeStepSize = Math.PI / 180 * 5;
         private const float MoveSpeed = 0.9f;
+        private static readonly Vector3D<float> PointOfView = new Vector3D<float>(0f, 971f, 2747f);
 
+        // TPV :
         public Vector3D<float> Position { get; private set; } = new Vector3D<float>(0.0f, 1000.0f, 2000.0f);
+        // FPV:
+        // public Vector3D<float> Position { get; private set; } = new Vector3D<float>(0.0f, 29f, -747f);
 
         // repulo elore megy z -
         //repulo hata megy z +
@@ -109,5 +113,15 @@ namespace hijacking
             // Update the UpVector to ensure it remains orthogonal to the ForwardVector
             //UpVector = Vector3D.Normalize(Vector3D.Cross(right, forward));
         }*/
+
+        public void SetTPV()
+        {
+            Position += PointOfView;
+        }
+        
+        public void SetFPV()
+        {
+            Position -= PointOfView;
+        }
     }
 }

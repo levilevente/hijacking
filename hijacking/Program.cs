@@ -47,6 +47,8 @@ namespace hijacking
         private const string ViewPosVariableName = "viewPos";
         private const string ShininessVariableName = "shininess";
 
+        private static bool pov = false;
+        
         static void Main(string[] args)
         {
             WindowOptions windowOptions = WindowOptions.Default;
@@ -230,9 +232,28 @@ namespace hijacking
             DrawFighter();
 
             //ImGuiNET.ImGui.ShowDemoWindow();
-            ImGuiNET.ImGui.Begin("Lighting properties",
+            ImGuiNET.ImGui.Begin("Pilot Position",
                 ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar);
-            ImGuiNET.ImGui.SliderFloat("Shininess", ref Shininess, 1, 200);
+            if (ImGui.RadioButton("POV", pov))
+            {
+                if (!pov)
+                {
+                    cameraDescriptor.SetFPV();
+                }
+                pov = true;
+                
+                Console.WriteLine("POV selected");
+            }
+            ImGui.SameLine();
+            if (ImGui.RadioButton("TPV", !pov))
+            {
+                if (pov)
+                {
+                    cameraDescriptor.SetTPV();
+                }
+                pov = false;
+                Console.WriteLine("TPV selected");
+            }
             ImGuiNET.ImGui.End();
 
 
