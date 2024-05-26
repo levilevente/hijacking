@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using System.Numerics;
+using ImGuiNET;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -36,6 +37,10 @@ namespace hijacking
         private static float viewerPositionSpeed = 0.09f;
 
         private static float rotationAngle = 0f;
+        
+        private static bool isColidingWithRoad = false;
+        
+        private static bool isColidingWithFighterJets = false;
 
         private const string ModelMatrixVariableName = "uModel";
         private const string NormalMatrixVariableName = "uNormal";
@@ -189,6 +194,7 @@ namespace hijacking
                 Hitbox roadHitbox = road.Hitbox.Translated(roadPosition);
                 if (airbusHitbox.IsColliding(roadHitbox))
                 {
+                    isColidingWithRoad = true;
                     arrangementModel.setColidingWithRoad();
                     cameraDescriptor.SetColidingWithRoad();
                 }
@@ -200,6 +206,7 @@ namespace hijacking
 
                 if (airbusHitbox.IsColliding(jetHitbox))
                 {
+                    isColidingWithFighterJets = true;
                     arrangementModel.setColidingWithFighterJet(i);
                     cameraDescriptor.SetColidingWithFighterJets();
                 }
@@ -234,7 +241,24 @@ namespace hijacking
             DrawRoad();
             DrawFighter();
 
+            if (isColidingWithFighterJets)
+            {
+                ImGui.SetNextWindowPos(new Vector2(window.Size.X / 2 - 100, window.Size.Y / 2 - 50));
+                ImGui.Begin("Game Over");
+                ImGui.Text("You have crashed into a fighter jet");
+                ImGui.End();
+            }
+
+            if (isColidingWithRoad)
+            {
+                ImGui.SetNextWindowPos(new Vector2(window.Size.X / 2 - 100, window.Size.Y / 2 - 50));
+                ImGui.Begin("Game Over");
+                ImGui.Text("You have crashed into the road");
+                ImGui.End();
+            }
+
             //ImGuiNET.ImGui.ShowDemoWindow();
+            ImGui.SetNextWindowPos(new Vector2(0,0));
             ImGuiNET.ImGui.Begin("Pilot Position",
                 ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar);
             if (ImGui.RadioButton("POV", pov))

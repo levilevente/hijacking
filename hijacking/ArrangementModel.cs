@@ -1,4 +1,8 @@
-﻿using Silk.NET.Maths;
+﻿using ImGuiNET;
+using Silk.NET.Maths;
+using Silk.NET.SDL;
+
+
 
 namespace hijacking
 {
@@ -99,7 +103,7 @@ namespace hijacking
         }
         
         public void setColidingWithFighterJet(int numberOfJet)
-        {
+        { 
             this.colidingWithFighterJets = numberOfJet;
         }
 
