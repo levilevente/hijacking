@@ -283,6 +283,14 @@ namespace hijacking
             }
             ImGuiNET.ImGui.End();
 
+            // a button to restart the application
+            ImGui.SetNextWindowPos(new Vector2(10, 60), ImGuiCond.Always);
+            ImGui.Begin("Control", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar);
+            if (ImGui.Button("Restart Application"))
+            {
+                // here we can restart the application (reinitialize the state)
+            }
+            ImGui.End();
 
             controller.Render();
         }
@@ -579,5 +587,6 @@ namespace hijacking
             if (error != ErrorCode.NoError)
                 throw new Exception("GL.GetError() returned " + error.ToString());
         }
+
     }
 }

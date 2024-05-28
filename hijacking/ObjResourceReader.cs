@@ -8,6 +8,7 @@ namespace hijacking
     {
         public static unsafe GlObject CreateAirbus(GL Gl)
         {
+            
             uint vao = Gl.GenVertexArray();
             Gl.BindVertexArray(vao);
             int wingIndex = 0;
@@ -50,7 +51,6 @@ namespace hijacking
 
             return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "road.png", hitbox);
         }
-
         public static unsafe GlObject CreateFighterJet(GL Gl)
         {
             uint vao = Gl.GenVertexArray();
@@ -72,7 +72,6 @@ namespace hijacking
 
             return CreateOpenGlObject(Gl, vao, glVertices, glColors, glIndices, "fighter_body.jpg", hitbox);
         }
-
         private static unsafe GlObject CreateOpenGlObject(GL Gl, uint vao, List<float> glVertices, List<float> glColors, List<uint> glIndices, String textureFile, Hitbox hitbox = null)
         {
             uint offsetPos = 0;
@@ -126,7 +125,6 @@ namespace hijacking
 
             return new GlObject(vao, vertices, colors, indices, indexArrayLength, Gl, texture, hitbox);
         }
-
         private static unsafe void CreateGlArraysFromObjArrays(List<float[]> objVertices, List<(int Vertex, int Texture,int Normal)[]> objFaces, List<float[]>objNormals, List<float[]>objTextures, List<float> glVertices, List<float> glColors, List<uint> glIndices)
         {
             Dictionary<string, int> glVertexIndices = new Dictionary<string, int>();
@@ -142,7 +140,6 @@ namespace hijacking
                 ProcessVertexOnFace(objVertices, objNormals, objTextures, glVertices, glIndices, objFace, 3, glVertexIndices);
             }
         }
-
         private static void ProcessVertexOnFace(List<float[]> objVertices, List<float[]> objNormals, List<float[]> objTextures, List<float> glVertices,
             List<uint> glIndices, (int Vertex, int Texture, int Normal)[] objFace, int i, Dictionary<string, int> glVertexIndices)
         {
@@ -172,7 +169,6 @@ namespace hijacking
             // add vertex to triangle indices
             glIndices.Add((uint)glVertexIndices[glVertexStringKey]);
         }
-
         private static unsafe void ReadObjDataForAirbus(out List<float[]> objVertices, out List<(int Vertex, int Texture,int Normal)[]> objFaces, out List<float[]>objNormals, out List<float[]>objTextures, out Hitbox hitbox)
         {
             objVertices = new List<float[]>();
@@ -258,7 +254,6 @@ namespace hijacking
             }
             hitbox = new Hitbox((min_x, min_y, min_z), (max_x, max_y, max_z));
         }
-        
         private static unsafe void ReadObjDataForFighter(out List<float[]> objVertices, out List<(int Vertex, int Texture,int Normal)[]> objFaces, out List<float[]>objNormals, out List<float[]>objTextures, out Hitbox hitbox)
         {
             objVertices = new List<float[]>();
@@ -404,7 +399,6 @@ namespace hijacking
             }
             hitbox = new Hitbox((min_x, min_y, min_z), (max_x, max_y, max_z));
         }
-        
         private static unsafe ImageResult ReadTextureImage(string textureResource)
         {
             ImageResult result;
