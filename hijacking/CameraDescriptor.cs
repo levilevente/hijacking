@@ -5,6 +5,7 @@ namespace hijacking
     {
         private const double AngleChangeStepSize = Math.PI / 180 * 5;
         private float MoveSpeed = 0.9f;
+        private float TurningSpeed = 0.9f;
         private static readonly Vector3D<float> PointOfView = new Vector3D<float>(0f, 915f, 2747f);
         private static readonly Vector3D<float> landingVector3D = new Vector3D<float>(0f, 0.5f, 0f);
         
@@ -36,7 +37,7 @@ namespace hijacking
 
             if (colidingWithRoad)
             {
-                MoveSpeed *= 0.9991f;
+                MoveSpeed *= 0.9981f;
                 var direction = ForwardVector * MoveSpeed;
                 Position += direction;
                 Target += direction;
@@ -62,8 +63,8 @@ namespace hijacking
             {
                 return;
             }
-            Position = new Vector3D<float>(Position.X + 10f, Position.Y, Position.Z);
-            Target = new Vector3D<float>(Target.X + 10f, Target.Y, Target.Z);
+            Position = new Vector3D<float>(Position.X + TurningSpeed, Position.Y, Position.Z);
+            Target = new Vector3D<float>(Target.X + TurningSpeed, Target.Y, Target.Z);
         }
 
         public void MoveLeft()
@@ -72,8 +73,8 @@ namespace hijacking
             {
                 return;
             }
-            Position = new Vector3D<float>(Position.X - 10f, Position.Y, Position.Z);
-            Target = new Vector3D<float>(Target.X - 10f, Target.Y, Target.Z);
+            Position = new Vector3D<float>(Position.X - TurningSpeed, Position.Y, Position.Z);
+            Target = new Vector3D<float>(Target.X - TurningSpeed, Target.Y, Target.Z);
         }
 
         public void RotateLeft()
@@ -140,6 +141,16 @@ namespace hijacking
         public void SetColidingWithFighterJets()
         {
             colidingWithFighterJets = true;
+        }
+        
+        public void setMovementSpeed(float speed)
+        {
+            MoveSpeed = speed;
+        }
+        
+        public void setTurningSpeed(float speed)
+        {
+            TurningSpeed = speed;
         }
     }
 }

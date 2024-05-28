@@ -40,9 +40,7 @@
       <None Remove="Resources\airbus\fighter_body.jpg" />
       <EmbeddedResource Include="Resources\airbus\fighter_body.jpg" />
       <None Remove="Resources\airbus\Airbus A310.obj" />
-      <EmbeddedResource Include="Resources\airbus\A310.obj" />
       <None Remove="Resources\airbus\Turkish Airlines.png" />
-      <EmbeddedResource Include="Resources\airbus\Turkish Airlines.png" />
     </ItemGroup>
 
 </Project>

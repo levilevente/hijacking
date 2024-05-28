@@ -8,8 +8,10 @@ namespace hijacking
 {
     internal class ArrangementModel
     {
-        private static float movementSpeed = 0.9f;
-        private static float planeSpeed = 0.9f;
+        private static float movementSpeed = 2.0f;
+        private static float planeSpeed = movementSpeed;
+        private static float TurningSpeed = 0.4f;
+        private static float PlaneTurningSpeed = 0.6f;
 
         public Vector3D<float> airplaneTranslation;
         public Vector3D<float>[] aircraftPosition;
@@ -21,7 +23,6 @@ namespace hijacking
 
         private bool colidingWithRoad = false;
         private int colidingWithFighterJets = -1;
-        
         public ArrangementModel()
         {
             airplaneTranslation = new Vector3D<float>(0, 0, 0);
@@ -57,7 +58,7 @@ namespace hijacking
             {
                 moveFighterJets();
                 airplaneTranslation.Z -= planeSpeed;
-                planeSpeed *= 0.9991f;
+                planeSpeed *= 0.9981f;
                 return;
             }
             
@@ -73,11 +74,11 @@ namespace hijacking
         
         public void TurnLeft()
         {
-            if (colidingWithFighterJets != -1)
+            if (colidingWithFighterJets != -1 || colidingWithRoad)
             {
                 return;
             }
-            airplaneTranslation.X -= 10.0f;
+            airplaneTranslation.X -= PlaneTurningSpeed;
             if (airplaneTranslation.X < -10000)
             {
                 airplaneTranslation.X = 10000;
@@ -86,11 +87,11 @@ namespace hijacking
         
         public void TurnRight()
         {
-            if (colidingWithFighterJets != -1)
+            if (colidingWithFighterJets != -1 || colidingWithRoad)
             {
                 return;
             }
-            airplaneTranslation.X += 10.0f;
+            airplaneTranslation.X += PlaneTurningSpeed;
             if (airplaneTranslation.X > 10000)
             {
                 airplaneTranslation.X = -10000;
@@ -131,39 +132,49 @@ namespace hijacking
 
              if (aircraftPosition[0].X < roadPosition.X + 700)
              {
-                 aircraftPosition[0].X += 0.4f;
+                 aircraftPosition[0].X += TurningSpeed;
              }
              else if (aircraftPosition[0].X > roadPosition.X + 700)
              {
-                 aircraftPosition[0].X -= 0.4f;
+                 aircraftPosition[0].X -= TurningSpeed;
              }
             
              if (aircraftPosition[1].X < roadPosition.X - 700)
              {
-                 aircraftPosition[1].X += 0.4f;
+                 aircraftPosition[1].X += TurningSpeed;
              }
              else if (aircraftPosition[1].X > roadPosition.X - 700)
              {
-                 aircraftPosition[1].X -= 0.4f;
+                 aircraftPosition[1].X -= TurningSpeed;
              }
             
              if (aircraftPosition[2].X < roadPosition.X - 700)
              {
-                 aircraftPosition[2].X += 0.4f;
+                 aircraftPosition[2].X += TurningSpeed;
              }
              else if (aircraftPosition[2].X > roadPosition.X - 700)
              {
-                 aircraftPosition[2].X -= 0.4f;
+                 aircraftPosition[2].X -= TurningSpeed;
              }
             
              if (aircraftPosition[3].X < roadPosition.X + 700)
              {
-                 aircraftPosition[3].X += 0.4f;
+                 aircraftPosition[3].X += TurningSpeed;
              }
              else if (aircraftPosition[3].X > roadPosition.X + 700)
              {
-                 aircraftPosition[3].X -= 0.4f;
+                 aircraftPosition[3].X -= TurningSpeed;
              } 
+        }
+        
+        public float getMovementSpeed()
+        {
+            return movementSpeed;
+        }
+        
+        public float getTurningSpeed()
+        {
+            return PlaneTurningSpeed;
         }
     }
 }

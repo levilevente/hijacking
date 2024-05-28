@@ -33,6 +33,18 @@ namespace hijacking
         private static GlCube skyBox;
 
         private static float Shininess = 50;
+        
+        private static Dictionary<Key, bool> keyStates = new Dictionary<Key, bool>
+        {
+            { Key.Left, false },
+            { Key.Right, false },
+            { Key.Down, false },
+            { Key.Up, false },
+            { Key.A, false },
+            { Key.D, false },
+            { Key.Space, false }
+        };
+
 
         private static float viewerPositionSpeed = 0.09f;
 
@@ -41,6 +53,7 @@ namespace hijacking
         private static bool isColidingWithRoad = false;
         
         private static bool isColidingWithFighterJets = false;
+        private static bool planeMiss = false;
 
         private const string ModelMatrixVariableName = "uModel";
         private const string NormalMatrixVariableName = "uNormal";
@@ -84,6 +97,8 @@ namespace hijacking
             foreach (var keyboard in inputContext.Keyboards)
             {
                 keyboard.KeyDown += Keyboard_KeyDown;
+                keyboard.KeyUp += Keyboard_KeyUp;
+
             }
 
             Gl = window.CreateOpenGL();
@@ -104,6 +119,8 @@ namespace hijacking
 
             LinkProgram();
 
+            cameraDescriptor.setMovementSpeed(arrangementModel.getMovementSpeed());
+            cameraDescriptor.setTurningSpeed(arrangementModel.getTurningSpeed());
            //Gl.Enable(EnableCap.CullFace);
 
             Gl.Enable(EnableCap.DepthTest);
@@ -148,40 +165,28 @@ namespace hijacking
 
         private static void Keyboard_KeyDown(IKeyboard keyboard, Key key, int arg3)
         {
-            switch (key)
+            if (keyStates.ContainsKey(key))
             {
-                case Key.Left:
-                    cameraDescriptor.RotateLeft();
-                    break;
-                case Key.Right:
-                    cameraDescriptor.RotateRight();
-                    break;
-                case Key.Down:
-                    cameraDescriptor.RotateDown();
-                    break;
-                case Key.Up:
-                    cameraDescriptor.RotateUp();
-                    break;
-                case Key.A:
-                    arrangementModel.TurnLeft();
-                    cameraDescriptor.MoveLeft();
-                    break;
-                case Key.D:
-                    arrangementModel.TurnRight();
-                    cameraDescriptor.MoveRight();
-                    break;
-                case Key.Space:
-                    cameraDescriptor.SetLanding();
-                    arrangementModel.setLand();
-                    break;
+                keyStates[key] = true;
             }
         }
+
+        private static void Keyboard_KeyUp(IKeyboard keyboard, Key key, int arg3)
+        {
+            if (keyStates.ContainsKey(key))
+            {
+                keyStates[key] = false;
+            }
+        }
+        
 
         private static void Window_Update(double deltaTime)
         {
             // multithreaded
             // make sure it is threadsafe
             // NO GL calls
+            PilotControl();
+            
             arrangementModel.AdvanceTime();
             cameraDescriptor.MoveForward();
 
@@ -210,6 +215,11 @@ namespace hijacking
                     arrangementModel.setColidingWithFighterJet(i);
                     cameraDescriptor.SetColidingWithFighterJets();
                 }
+            }
+
+            if (airbusPosition.Y < arrangementModel.roadPosition.Y && !planeMiss)
+            {
+                planeMiss = true;
             }
 
             controller.Update((float)deltaTime);
@@ -256,6 +266,14 @@ namespace hijacking
                 ImGui.Text("You have crashed into the road");
                 ImGui.End();
             }
+            
+            if (planeMiss)
+            {
+                ImGui.SetNextWindowPos(new Vector2(window.Size.X / 2 - 100, window.Size.Y / 2 - 50));
+                ImGui.Begin("Game Over");
+                ImGui.Text("You have missed the road");
+                ImGui.End();
+            }
 
             //ImGuiNET.ImGui.ShowDemoWindow();
             ImGui.SetNextWindowPos(new Vector2(0,0));
@@ -282,15 +300,6 @@ namespace hijacking
                 Console.WriteLine("TPV selected");
             }
             ImGuiNET.ImGui.End();
-
-            // a button to restart the application
-            ImGui.SetNextWindowPos(new Vector2(10, 60), ImGuiCond.Always);
-            ImGui.Begin("Control", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar);
-            if (ImGui.Button("Restart Application"))
-            {
-                // here we can restart the application (reinitialize the state)
-            }
-            ImGui.End();
 
             controller.Render();
         }
@@ -413,7 +422,7 @@ namespace hijacking
                 SetModelMatrix(modelMatrixForCenterCube);
                 Gl.BindVertexArray(airbus.Vao);
             }
-            else
+            else if (arrangementModel.getColifingWithFighterJet() != -1)
             {   
                 var lookDownRotationMatrix = Matrix4X4.CreateRotationX((float)-Math.PI / 2);
                 var translationMatrix = Matrix4X4.CreateTranslation(arrangementModel.airplaneTranslation);
@@ -586,6 +595,41 @@ namespace hijacking
             var error = (ErrorCode)Gl.GetError();
             if (error != ErrorCode.NoError)
                 throw new Exception("GL.GetError() returned " + error.ToString());
+        }
+
+        private static void PilotControl()
+        {
+            if (keyStates[Key.Left])
+            {
+                cameraDescriptor.RotateLeft();
+            }
+            if (keyStates[Key.Right])
+            {
+                cameraDescriptor.RotateRight();
+            }
+            if (keyStates[Key.Down])
+            {
+                cameraDescriptor.RotateDown();
+            }
+            if (keyStates[Key.Up])
+            {
+                cameraDescriptor.RotateUp();
+            }
+            if (keyStates[Key.A])
+            {
+                arrangementModel.TurnLeft();
+                cameraDescriptor.MoveLeft();
+            }
+            if (keyStates[Key.D])
+            {
+                arrangementModel.TurnRight();
+                cameraDescriptor.MoveRight();
+            }
+            if (keyStates[Key.Space])
+            {
+                cameraDescriptor.SetLanding();
+                arrangementModel.setLand();
+            }
         }
 
     }
