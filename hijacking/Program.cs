@@ -34,6 +34,8 @@ namespace hijacking
 
         private static float Shininess = 50;
         
+        private static float movementSpeed = 2.0f;
+        
         private static Dictionary<Key, bool> keyStates = new Dictionary<Key, bool>
         {
             { Key.Left, false },
@@ -263,7 +265,7 @@ namespace hijacking
             {
                 ImGui.SetNextWindowPos(new Vector2(window.Size.X / 2 - 100, window.Size.Y / 2 - 50));
                 ImGui.Begin("Game Over");
-                ImGui.Text("You have crashed into the road");
+                ImGui.Text("Congratulations you have landed safely!");
                 ImGui.End();
             }
             
@@ -279,7 +281,7 @@ namespace hijacking
             ImGui.SetNextWindowPos(new Vector2(0,0));
             ImGuiNET.ImGui.Begin("Pilot Position",
                 ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar);
-            if (ImGui.RadioButton("POV", pov))
+            if (ImGui.RadioButton("FPV", pov))
             {
                 if (!pov)
                 {
@@ -300,6 +302,13 @@ namespace hijacking
                 Console.WriteLine("TPV selected");
             }
             ImGuiNET.ImGui.End();
+            
+            ImGui.SetNextWindowPos(new Vector2(0, 50));
+            // set a bar for setting the movementSpeed min speed is 1.5 and max speed is 6.0
+            ImGui.Begin("Movement Speed");
+            ImGui.SliderFloat("Movement Speed", ref movementSpeed, 1.5f, 6.0f);
+            arrangementModel.setMovementSpeed(movementSpeed);
+            cameraDescriptor.setMovementSpeed(movementSpeed);
 
             controller.Render();
         }
@@ -431,12 +440,6 @@ namespace hijacking
                 SetModelMatrix(modelMatrixForCenterCube);
                 Gl.BindVertexArray(airbus.Vao);
             }
-            
-            //var modelMatrixForTable = Matrix4X4.CreateScale(1f, 1f, 1f);
-            //SetModelMatrix(modelMatrixForTable);
-            //Gl.BindVertexArray(table.Vao);
-            //Gl.DrawElements(GLEnum.Triangles, table.IndexArrayLength, GLEnum.UnsignedInt, null);
-            //Gl.BindVertexArray(0);
 
             int textureLocation = Gl.GetUniformLocation(program, TextureUniformVariableName);
             if (textureLocation == -1)
@@ -482,13 +485,7 @@ namespace hijacking
                     SetModelMatrix(modelMatrixForCenterCube);
                     Gl.BindVertexArray(fighterJets[i].Vao);
                 }
-            
-                //var modelMatrixForTable = Matrix4X4.CreateScale(1f, 1f, 1f);
-                //SetModelMatrix(modelMatrixForTable);
-                //Gl.BindVertexArray(table.Vao);
-                //Gl.DrawElements(GLEnum.Triangles, table.IndexArrayLength, GLEnum.UnsignedInt, null);
-                //Gl.BindVertexArray(0);
-
+                
                 int textureLocation = Gl.GetUniformLocation(program, TextureUniformVariableName);
                 if (textureLocation == -1)
                 {

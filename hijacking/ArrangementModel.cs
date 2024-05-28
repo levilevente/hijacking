@@ -115,6 +115,7 @@ namespace hijacking
         
         public void setColidingWithRoad()
         {
+            movementSpeed = 7f;
             this.colidingWithRoad = true;
         }
         
@@ -170,6 +171,15 @@ namespace hijacking
         public float getMovementSpeed()
         {
             return movementSpeed;
+        }
+        
+        public void setMovementSpeed(float speed)
+        {
+            if (!colidingWithRoad)
+            {
+                movementSpeed = speed;
+                planeSpeed = speed;
+            }
         }
         
         public float getTurningSpeed()

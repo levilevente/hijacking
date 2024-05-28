@@ -145,7 +145,10 @@ namespace hijacking
         
         public void setMovementSpeed(float speed)
         {
-            MoveSpeed = speed;
+            if (!colidingWithRoad)
+            {
+                MoveSpeed = speed;
+            }
         }
         
         public void setTurningSpeed(float speed)
