@@ -74,7 +74,7 @@ namespace hijacking
         static void Main(string[] args)
         {
             WindowOptions windowOptions = WindowOptions.Default;
-            windowOptions.Title = "Levi naon meno projektje";
+            windowOptions.Title = "Hijacking";
             windowOptions.Size = new Vector2D<int>(1000, 1000);
 
             // on some systems there is no depth buffer by default, so we need to make sure one is created
