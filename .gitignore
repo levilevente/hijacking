@@ -6,6 +6,9 @@
 bin/
 obj/
 
+[Bb]in/
+[Oo]bj/
+
 .DS_Store
 
 # Common node modules locations
