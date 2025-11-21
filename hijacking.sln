@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hijacking", "hijacking\hijacking.csproj", "{D354A99A-C330-4311-B18F-893F9FBED263}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hijacking", "hijacking.csproj", "{6DA6FF1F-0BA9-4F26-9D4B-1C76CDAC8E03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{D354A99A-C330-4311-B18F-893F9FBED263}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D354A99A-C330-4311-B18F-893F9FBED263}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D354A99A-C330-4311-B18F-893F9FBED263}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DA6FF1F-0BA9-4F26-9D4B-1C76CDAC8E03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DA6FF1F-0BA9-4F26-9D4B-1C76CDAC8E03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DA6FF1F-0BA9-4F26-9D4B-1C76CDAC8E03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DA6FF1F-0BA9-4F26-9D4B-1C76CDAC8E03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

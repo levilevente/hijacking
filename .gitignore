@@ -6,6 +6,8 @@
 bin/
 obj/
 
+.idea
+
 [Bb]in/
 [Oo]bj/
 

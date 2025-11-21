@@ -43,16 +43,10 @@ This codebase is structured to help you learn:
 
 ## 🎮 Controls
 
-| Input | Action |
-| :--- | :--- |
-| **W / S** | Pitch Down / Up |
-| **A / D** | Roll Left / Right |
-| **Q / E** | Yaw Left / Right |
-| **Space** | Thrust / Accelerate |
-| **Shift** | Brake / Decelerate |
-| **Mouse** | Look Around (Camera) |
-| **Esc** | Pause / Exit |
-
+| Input | Action               |
+| :--- |:---------------------|
+| **A / D** | Roll Left / Right    |
+| **Space** | Plane landing        |
 ---
 
 ## ⚙️ Installation & Setup
